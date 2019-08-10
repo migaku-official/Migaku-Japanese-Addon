@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # 
 from os.path import join
-from aqt.utils import showInfo
+from aqt.utils import showInfo, askUser
 import re
 
 class AutoCSSJSHandler:
@@ -166,6 +166,7 @@ class AutoCSSJSHandler:
     def checkVariantSyntax(self):
         config = self.getConfig()
         syntaxErrors = ''
+        fieldErrors = []
         for variant in ['PitchGraphFields', 'AudioFields']:
             varAr = config[variant].split(';')
             if len(varAr) not in [2,3]:
@@ -173,13 +174,31 @@ class AutoCSSJSHandler:
             else:
                 for field in varAr[0].split(','):
                     if field.lower() not in ['clipboard' , 'none'] and not self.fieldExists(field):
-                        syntaxErrors += '\nThe "' + variant + '" configuration "'+ config[variant] +'" is incorrect. This field does not exist in your collection.'    
+                        syntaxErrors += '\nThe "' + variant + '" configuration "'+ config[variant] +'" is incorrect. The "' + field + '" does not exist in your collection.'    
+                        fieldErrors.append(field)
                 if varAr[1].lower() not in ['overwrite', 'add', 'no']:
                     syntaxErrors += '\nThe "' + variant + '" configuration "'+ config[variant] +'" is incorrect. Please ensure that second value is either "overwrite", "add", or "no".'    
         if syntaxErrors != '':
-            showInfo('Please make sure the syntax is as follows "field,field;type(;separator)". The syntax is incorrect for the following entries:' + syntaxErrors, title="MIA Japanese Support Error")
+            if len(fieldErrors) > 0:
+                if askUser('Please make sure the syntax is as follows "field,field;type(;separator)". The syntax is incorrect for the following entries:' + syntaxErrors + '\n\n Would you like to delete these fields from you configuration?', title="MIA Japanese Support Error"):
+                    self.deletePitchAudioFields(fieldErrors, config)
+            else:
+                showInfo('Please make sure the syntax is as follows "field,field;type(;separator)". The syntax is incorrect for the following entries:' + syntaxErrors, title="MIA Japanese Support Error")
             return False
         return True
+
+    def deletePitchAudioFields(self, fields, config):
+        for variant in ['PitchGraphFields', 'AudioFields']:
+            varAr = config[variant].split(';')
+            currentFields = varAr[0].split(',')
+            for field in fields:
+                if field in currentFields:
+                    currentFields.remove(field)
+            config[variant] = ','.join(currentFields) + ';' + varAr[1] 
+            if len(varAr) > 2:
+                config[variant] += ';' +  varAr[2]
+        self.mw.addonManager.writeConfig(__name__, config)
+                        
 
     def fieldExists(self, field):
         models = self.mw.col.models.all()
