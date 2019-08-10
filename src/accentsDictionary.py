@@ -40,7 +40,7 @@ class AccentsDictionary:
                 dictionary[entry[0]].append(entry)
             else:
                 dictionary[entry[0]] = [entry]
-        return accentDictionary
+        return dictionary
 
 
     def testPotentialToKihonkei(self, yomi, word):
