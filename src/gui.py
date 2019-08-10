@@ -538,11 +538,11 @@ class JSGui(QWidget):
             kana.setChecked(True)
         if options[1].lower() == 'on' :
             dictF.setChecked(True)
-        if options[2].lower() == 'on' :
-            audio.setChecked(True)
         if options[3].lower() == 'on' :
-            graphs.setChecked(True)
+            audio.setChecked(True)
         if options[4].lower() == 'on' :
+            graphs.setChecked(True)
+        if options[2].lower() == 'on' :
             accents.setChecked(True)
 
     def resetMIAActiveFields(self):
@@ -727,21 +727,21 @@ class JSGui(QWidget):
         if self.ui.sentenceDictForm.isChecked():
             sentenceConfig[1] = 'on'
         if self.ui.sentenceAudio.isChecked():
-            sentenceConfig[2] = 'on'
-        if self.ui.sentenceGraphs.isChecked():
             sentenceConfig[3] = 'on'
-        if self.ui.sentenceAccents.isChecked():
+        if self.ui.sentenceGraphs.isChecked():
             sentenceConfig[4] = 'on'
+        if self.ui.sentenceAccents.isChecked():
+            sentenceConfig[2] = 'on'
         if self.ui.wordKana.isChecked():
             wordConfig[0] = 'on'
         if self.ui.wordDictForm.isChecked():
             wordConfig[1] = 'on'
         if self.ui.wordAudio.isChecked():
-            wordConfig[2] = 'on'
-        if self.ui.wordGraphs.isChecked():
             wordConfig[3] = 'on'
-        if self.ui.wordAccents.isChecked():
+        if self.ui.wordGraphs.isChecked():
             wordConfig[4] = 'on'
+        if self.ui.wordAccents.isChecked():
+            wordConfig[2] = 'on'
         return ';'.join(sentenceConfig),';'.join(wordConfig);
 
     def saveActiveFields(self):
