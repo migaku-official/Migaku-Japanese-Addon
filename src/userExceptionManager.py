@@ -366,7 +366,14 @@ class UserExceptionManager:
         self.mw.reset()
         progWid.hide()
         showInfo('Rule(s) have been applied ' + str(appliedRules) + ' times.<br>' + str(altered) + ' notes have been altered.' , parent = parentWidget, title="MIA Japanese Support Notice")
-                
+    
+    def applyRulesToText(self, text):
+        for ogOv in self.ueList:
+            original = ogOv[0] 
+            overwrite = ogOv[1]
+            if original in text:
+                text = text.replace(original, overwrite)
+        return text          
 
     def saveUEList(self):  #saves UE List to file    
         self.model.saveList(self.listPath)
