@@ -338,13 +338,13 @@ def revBridgeReroute(self, cmd):
 ogRevReroute = aqt.reviewer.Reviewer._linkHandler 
 aqt.reviewer.Reviewer._linkHandler = revBridgeReroute
 
-def revBridgeReroute(self, cmd):
+def prevBridgeReroute(self, cmd):
     if checkProfile() and getConfig()['PlayAudioOnClick'] == 'on':
         if cmd.startswith('playAudio;'):
             clickPlayAudio(cmd)
             return
 
-AnkiWebView._onBridgeCmd = wrap(AnkiWebView._onBridgeCmd, revBridgeReroute)
+AnkiWebView._onBridgeCmd = wrap(AnkiWebView._onBridgeCmd, prevBridgeReroute)
 
 def addUndoFunctionality(self):
     self.web.eval(undoJS)
