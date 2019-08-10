@@ -24,111 +24,12 @@ class OgOvFilter(QSortFilterProxyModel):
         self.strToCompare  = strToCompare
         self.invalidateFilter()
 
-    # def lessThan(Left, right):
-    #     leftRow = left.row()
-    #     rightRow = right.row()
-    #     leftIdx = sourceModel().index(leftRow, 0, QModelIndex())
-    #     rightIdx = sourceModel().index(rightRow, 0, QModelIndex())
-    #     leftOg = len(sourceModel().data(leftIdx).toString())
-    #     rightOg = len(sourceModel().data(rightIdx).toString())
-    #     leftIdx = sourceModel().index(leftRow, 1, QModelIndex())
-    #     rightIdx = sourceModel().index(rightRow, 1, QModelIndex())
-    #     leftOv = len(sourceModel().data(leftIdx).toString())
-    #     rightOv = len(sourceModel().data(rightIdx).toString())
-
-    #     # if left
-
-    #     # if len(left)
-    #     return False
-
-    # def sort(self, col, order=QtCore.Qt.AscendingOrder):
-
-    #     # Storing persistent indexes
-    #     self.layoutAboutToBeChanged.emit()
-    #     oldIndexList = self.persistentIndexList()
-    #     oldIds = self._dfDisplay.index.copy()
-
-    #     # Sorting data
-    #     column = self._dfDisplay.columns[col]
-    #     ascending = (order == QtCore.Qt.AscendingOrder)
-    #     if column in self._sortBy:
-    #         i = self._sortBy.index(column)
-    #         self._sortBy.pop(i)
-    #         self._sortDirection.pop(i)
-    #     self._sortBy.insert(0, column)
-    #     self._sortDirection.insert(0, ascending)
-    #     self.updateDisplay()
-
-
-
-    #     rl = self.ui.rulesTable
-    #     foundOriginal = []
-    #     foundOverwrite = []
-    #     text = text.lower()
-    #     for original, overwrite in self.ueMng.ueList.items():
-    #         LOriginal = original.lower()
-    #         LOverwrite = overwrite.lower()
-    #         if LOriginal == text:
-    #             foundOriginal.append([original, overwrite])
-    #         elif text in LOriginal: 
-    #             foundOriginal.append([original, overwrite])
-    #         elif LOverwrite == text:
-    #             foundOverwrite.append([original, overwrite])
-    #         elif text in LOverwrite: 
-    #             foundOverwrite.append([original, overwrite])   
-    #     sorted(foundOriginal, key=len)
-    #     sorted(foundOverwrite, key=len)
-
-    #     for ogOv in foundOriginal:
-    #         self.addRuleToList(ogOv[0], ogOv[1])
-    #     for ogOv in foundOverwrite:
-    #         self.addRuleToList(ogOv[0], ogOv[1])
-    #     self.updateRuleCounter()
-
-
-
-
-
-
-
-    #     # Updating persistent indexes
-    #     newIds = self._dfDisplay.index
-    #     newIndexList = []
-    #     for index in oldIndexList:
-    #         id = oldIds[index.row()]
-    #         newRow = newIds.get_loc(id)
-    #         newIndexList.append(self.index(newRow, index.column(), index.parent()))
-    #     self.changePersistentIndexList(oldIndexList, newIndexList)
-    #     self.layoutChanged.emit()
-    #     self.dataChanged.emit(QtCore.QModelIndex(), QtCore.QModelIndex())
-
-
-    # def sort(self, column, sortRole, text= False):
-    #     # Storing persistent indexes
-    #     self.layoutAboutToBeChanged.emit()
-    #     oldIndexList = self.persistentIndexList()
-    #     oldIds = self._dfDisplay.index.copy()
-
-
-    #     # Updating persistent indexes
-    #     newIds = self._dfDisplay.index
-    #     newIndexList = []
-    #     for index in oldIndexList:
-    #         id = oldIds[index.row()]
-    #         newRow = newIds.get_loc(id)
-    #         newIndexList.append(self.index(newRow, index.column(), index.parent()))
-    #     self.changePersistentIndexList(oldIndexList, newIndexList)
-    #     self.layoutChanged.emit()
-    #     self.dataChanged.emit(QtCore.QModelIndex(), QtCore.QModelIndex())
-    #     
     def ascendingOrder(self):
         self.sourceModel().ueList = sorted(self.sourceModel().ueList)
 
 
     def testData(self, text):
         listBeforeReorder = self.sourceModel().ueList
-        # showInfo(str(self.sourceModel().ueList))
-
         foundOriginal = []
         foundOverwrite = []
         notFound = []
@@ -148,16 +49,8 @@ class OgOvFilter(QSortFilterProxyModel):
                 foundOverwrite.append([original, overwrite])
             else:
                 notFound.append([original, overwrite])   
-        
-        
-
-
         self.sourceModel().ueList = sorted(foundOriginal, key= lambda x: len(x[0])) + sorted(foundOverwrite,  key= lambda x: len(x[1])) + notFound
-        # for ogOv in foundOriginal:
-        #     self.addRuleToList(ogOv[0], ogOv[1])
-        # for ogOv in foundOverwrite:
-        #     self.addRuleToList(ogOv[0], ogOv[1])
-        # self.updateRuleCounter()
+
 
     def saveList(self, path):
         ueList = self.sourceModel().ueList
@@ -179,11 +72,8 @@ class OgOvFilter(QSortFilterProxyModel):
         return True
 
     def headerData(self, section, orientation, role):
-        # if display role of vertical headers
         if orientation == Qt.Vertical and role == Qt.DisplayRole:
-            # return the actual row number
             return section + 1
-        # for other cases, rely on the base implementation
         return super(OgOvFilter, self).headerData(section, orientation, role)
 
 
@@ -203,18 +93,11 @@ class RulesModel(QAbstractTableModel):
         return 2
 
     def data(self, index, role=Qt.DisplayRole):
-        """ Depending on the index and role given, return data. If not 
-            returning data, return None (PySide equivalent of QT's 
-            "invalid QVariant").
-        """
-
         if not index.isValid():
             return None
 
         if not 0 <= index.row() < len(self.ueList):
             return None
-        # if role == Qt.BackgroundRole and index.column() == 2:
-                # return self.create_gradient_brush()
         if role == Qt.DisplayRole or role == Qt.EditRole:
             original = self.ueList[index.row()][0]
             overwrite = self.ueList[index.row()][1]
@@ -223,23 +106,10 @@ class RulesModel(QAbstractTableModel):
                 return original
             elif index.column() == 1:
                 return overwrite
-            # elif index.column() == 2:
-                # self.table.item(index.row(), 2).setStyleSheet('QTableView.item { background-color: blue;}')
-                # return 'X'
-            #     deleteRuleButton = QPushButton("X")
-            #     deleteRuleButton.setFixedWidth(40)
-                # deleteRuleButton.clicked.connect(self.removeRule)
-                # self.table.setInsdexWidget(index, deleteRuleButton)
-        
         return None
 
-    # def showFullList(self):
-
-
-    # def searchList(self):
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
-        """ Set the headers to be displayed. """
         if role != Qt.DisplayRole:
             return None
 
@@ -248,14 +118,11 @@ class RulesModel(QAbstractTableModel):
                 return "Original"
             elif section == 1:
                 return "Overwrite"
-            # elif section == 2:
-                # return ""
         if orientation == Qt.Vertical:
             return section + 1;
         return None
 
     def insertRows(self, position= False, rows=1, index=QModelIndex(), original= False, overwrite=False):
-        """ Insert a row into the model. """
         if not position:
             position = self.rowCount()
         self.beginInsertRows(QModelIndex(), position, position)
@@ -263,13 +130,11 @@ class RulesModel(QAbstractTableModel):
             
             if original and overwrite:
                 self.ueList.insert(position + row, [original, overwrite])
-                # self.ueList.append([original, overwrite])
         self.endInsertRows()
         self.mng.saveUEList()
         return True
 
     def removeRows(self, position, rows=1, index=QModelIndex()):
-        """ Remove a row from the model. """
         self.beginRemoveRows(QModelIndex(), position, position + rows - 1)
 
         del self.ueList[position:position+rows]
@@ -278,9 +143,6 @@ class RulesModel(QAbstractTableModel):
         return True
 
     def setData(self, index, value, role=Qt.EditRole, overwriteRule = False, ruleDict = None):
-        """ Adjust the data (set it to <value>) depending on the given 
-            index and role. 
-        """
         if role != Qt.EditRole:
             return False
 
@@ -289,7 +151,6 @@ class RulesModel(QAbstractTableModel):
             rule[0] = ruleDict['og']
             rule[1] = ruleDict['ov']
             self.mng.saveUEList()
-            # self.dataChanged.emit(index, index)
             return True
         elif (index.isValid() and 0 <= index.row() < len(self.ueList)):
             rule = self.ueList[index.row()]
@@ -316,10 +177,6 @@ class RulesModel(QAbstractTableModel):
                  
 
     def flags(self, index):
-        """ Set the item flags at the given index. Seems like we're 
-            implementing this function just to see how it's done, as we 
-            manually adjust each tableView to have NoEditTriggers.
-        """
         if not index.isValid():
             return Qt.ItemIsEnabled
         return Qt.ItemFlags(QAbstractTableModel.flags(self, index) |
@@ -335,14 +192,7 @@ class UserExceptionManager:
         self.activeFields = False
         self.model = False
 
-    # def loadMainMenu(self):# loads menu into main JS menu as a new tab, uses UI, probably its own class that is accessed as a property
-
     def getListPath(self):
-        # bigList = []
-        # for i in range(100000):
-        #     bigList.append(['b' + str(i), 'c' + str(i)])
-        # with open(join(self.mw.col.media.dir(), 'biglistao.json'), 'w') as outfile:
-        #     json.dump(bigList, outfile, ensure_ascii=False)
         return join(self.mw.col.media.dir(), '_userExceptionList.json')
 
     def updateCount(self, counter):
@@ -370,7 +220,6 @@ class UserExceptionManager:
         self.addMenu.ui.addRuleButton.clicked.connect(self.addRuleAndClearText)
         
 
-    # def addToUEList(self): # add new exception
 
     def addRuleAndClearText(self):
         if self.addRule(self.addMenu.ui.originalLE.text(), self.addMenu.ui.overwriteLE.text(), self.addMenu.ui.ncAddCB.isChecked(), self.addMenu.ui.lcAddCB.isChecked(), self.addMenu, True):
@@ -393,8 +242,6 @@ class UserExceptionManager:
     def setupModel(self, gui):
         self.proxyFilter = OgOvFilter(RulesModel(self.ueList, self, gui))
         self.model = self.proxyFilter
-        # self.proxyFilter.setSourceModel(RulesModel(self.ueList, self, gui))
-        # self.model = RulesModel(self.ueList, self, gui)
         self.proxyFilter.setFilterKeyColumn(0)
 
     def addRule(self, original, overwrite, newCards, learnedCards, parentWidget, addMenu = False):
@@ -411,7 +258,7 @@ class UserExceptionManager:
                 return False, False
             else:
                 edit = True
-        if edit: #setData(self, index, value, role=Qt.EditRole, overwriteRule = False, rule = None):
+        if edit:
             self.model.setData(None, None, Qt.EditRole, True, {'row': foundId, 'og': original, 'ov': overwrite})
         else:
             self.writeRule(original, overwrite)
@@ -456,10 +303,6 @@ class UserExceptionManager:
         return anki.find.Finder(self.mw.col).findNotes('')
 
 
-# "coloredhover;all;MIA Japanese;Sentence;Expression;front",
-                        # "coloredkanjireading;all;MIA Japanese;Sentence;Expression;back",
-                        # "coloredhover;all;MIA Japanese;Sentence;Meaning;back"
-#
     def cardMeetsCriteria(self, cards, newCards, learnedCards):
         for card in cards:
             if (card.type == 0 and newCards) or ((card.type == 1 or card.type == 2) and learnedCards):
@@ -484,8 +327,7 @@ class UserExceptionManager:
         return progressWidget, bar; 
 
     def applyRules(self, ruleList, newCards, learnedCards, parentWidget, notes = False, message = False):
-        if not self.activeFields:
-            self.activeFields = self.getActiveFields()
+        self.activeFields = self.getActiveFields()
         if not notes:
             notes = self.getAllNotes()
         altered = 0
@@ -508,9 +350,7 @@ class UserExceptionManager:
                         for ogOv in ruleList:
                             original = ogOv[0] 
                             overwrite = ogOv[1]
-                            # showInfo(original + ' ' + overwrite)
                             if original in note[field]:
-                                # showInfo('found')
                                 if not alreadyAltered:
                                     altered += 1
                                 if not checkpointed:
@@ -527,26 +367,12 @@ class UserExceptionManager:
         progWid.hide()
         showInfo('Rule(s) have been applied ' + str(appliedRules) + ' times.<br>' + str(altered) + ' notes have been altered.' , parent = parentWidget, title="MIA Japanese Support Notice")
                 
-    def applyRulesToText(self, text):
-        for ogOv in self.ueList:
-            original = ogOv[0] 
-            overwrite = ogOv[1]
-            if original in text:
-                text = text.replace(original, overwrite)
-        return text
 
     def saveUEList(self):  #saves UE List to file    
         self.model.saveList(self.listPath)
-        # with codecs.open(self.listPath, "w","utf-8") as outfile:
-            # json.dump(self.model.ueList, outfile, ensure_ascii=False)
-        
-    # def deleteRule(self, original):
-    #     foundId = self.ruleExists(original)
-    #     if foundId is not False:
-    #         del self.ueList[foundId]
 
     def importUEList(self, fileName, combine, overwriteCollides):  #imports new list overwrite if desired
-        # try:
+        try:
             with open(fileName, "r", encoding="utf-8") as importedList:
                 newList = json.load(importedList)
 
@@ -581,33 +407,13 @@ class UserExceptionManager:
                 
                 return [totalImported, ignoredOrOverwritten]       
             else:
-
-
-            # if combine:
-            #     tempUEList = {}
-            #     ogCount = len(self.ueList)
-            #     original = next(iter(newList))
-            #     if not isinstance(original, str) or not isinstance(newList[original], str):
-            #         showInfo('The overwrite rules list could not be imported. Please make sure the target file is a valid overwrite rules list and try again.', title="MIA Japanese Support Error")
-            #         return False
-            #     if overwriteCollides:
-            #         tempUEList.update(self.ueList)
-            #         tempUEList.update(newList)
-            #     else:
-            #         tempUEList.update(newList)
-            #         tempUEList.update(self.ueList)
-            #     self.ueList = tempUEList
-            #     self.saveUEList()
-
-            #     return True       
-            # else:
                 self.model.sourceModel().ueList = newList
                 self.saveUEList()
          
                 return [len(self.ueList), 0]
-        # except:
-        #     showInfo('The overwrite rules list could not be imported. Please make sure the target file is a valid overwrite rules list and try again.', title="MIA Japanese Support Error")
-        #     return False
+        except:
+            showInfo('The overwrite rules list could not be imported. Please make sure the target file is a valid overwrite rules list and try again.', title="MIA Japanese Support Error")
+            return False
     
     def getConfig(self):
         return self.mw.addonManager.getConfig(__name__)
@@ -618,24 +424,3 @@ class UserExceptionManager:
         showInfo('The overwrite rules list has been exported to "' + fileName +'"', title="MIA Japanese Support Notice")
 
 
-    # def (self):
-
-    # def (self):
-
-    # def (self):
-
-    # def (self):
-
-    # def (self):
-
-    # def (self):
-
-    # def (self):
-
-    # def (self):
-
-    # def (self):
-
-    # def (self):
-
-    # def (self):

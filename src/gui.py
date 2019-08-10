@@ -224,7 +224,7 @@ class JSGui(QWidget):
         nc = self.ui.ncAllCB.isChecked() 
         lc = self.ui.lcAllCB.isChecked()
         if nc or lc:
-            self.ueMng.applyRules(self.ueMng.ueList, nc, lc, self)
+            self.ueMng.applyRules(self.ueMng.model.sourceModel().ueList, nc, lc, self)
 
     def applyEditedRule(self, rule, nc, lc):
         if nc or lc:
