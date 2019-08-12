@@ -21,16 +21,15 @@ from operator import itemgetter
 addon_path = dirname(__file__)
 import platform
 
-
-
-class JSGui(QWidget):
+class JSGui(QScrollArea):
     def __init__(self, mw, colArray, MIAModel, reboot, CSSJSHandler, UEManager):
-        super().__init__()
+        super(JSGui, self).__init__()
         self.mw = mw 
         self.cA = self.updateCurrentProfileInfo(colArray)
         self.allFields = self.getAllFields()
+        self.cont = QWidget()
         self.ui = Ui_Dialog()
-        self.ui.setupUi(self)
+        self.ui.setupUi(self.cont)
         self.reboot = reboot
         self.ueMng = UEManager
         self.CSSJSHandler = CSSJSHandler
@@ -73,9 +72,11 @@ class JSGui(QWidget):
     def setInitialValues(self):
         self.setWindowIcon(QIcon(join(addon_path, 'icons', 'mia.png')))
         self.setWindowTitle("Japanese Support Settings")
-        self.setWindowFlags(Qt.Dialog |Qt.MSWindowsFixedSizeDialogHint)
-        self.setFixedSize(self.size())
-        # self.setSizeGripEnabled( False )
+        self.cont.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+        self.cont.setFixedSize(1167, 725)
+        self.setWidget(self.cont)
+        self.setWidgetResizable(True)
+        self.resize(1200, 750)
         self.initActiveFieldsCB()
         self.setToolTips()
         self.loadCurrentAFs()
@@ -160,7 +161,6 @@ class JSGui(QWidget):
         if added:
             self.ui.originalLE.setText('')
             self.ui.overwriteLE.setText('')
-            self.clearRulesTable()
             self.ui.searchRulesLE.setText('')
 
             # self.ui.rulesTable.setSortingEnabled(False)
@@ -301,7 +301,6 @@ class JSGui(QWidget):
         self.ui.exportRules.clicked.connect(self.exportRules)
         self.ui.importRules.clicked.connect(self.importRules)
         self.ui.runRulesButton.clicked.connect(self.applyAllRules)
-        # self.ui.searchRulesLE.textChanged.connect(self.initRuleSearch)
         self.ui.searchRulesLE.returnPressed.connect(self.initRuleSearch)
         self.ui.searchRulesButton.clicked.connect(self.initRuleSearch)
         self.ui.miaSiteIcon.clicked.connect(lambda: openLink('https://massimmersionapproach.com/'))
@@ -320,8 +319,6 @@ class JSGui(QWidget):
 
 
     def initRuleSearch(self):
-        #testing
-        
         text = self.ui.searchRulesLE.text()
         if text == '':
             self.ueMng.model.ascendingOrder()
@@ -329,21 +326,14 @@ class JSGui(QWidget):
             self.updateRuleCounter()   
             self.ui.rulesTable.scrollToTop()
         else:
-            
-            # if text != '':
-           
             self.ueMng.model.testData(text)
             self.ueMng.model.setFilterByColumn(text)
-            # self.ueMng.model.sort(Qt.AscendingOrder)
             self.updateRuleCounter()   
-            self.ui.rulesTable.scrollToTop()
-            # self.ueMng.model.sort(text= text)
-        
+            self.ui.rulesTable.scrollToTop() 
         return
 
         
         text = self.ui.searchRulesLE.text()
-        self.clearRulesTable()
         if text == '':
             self.loadUEList()
         else:
@@ -379,7 +369,6 @@ class JSGui(QWidget):
         fileName, _ = QFileDialog.getSaveFileName(self,"Save Overwrite Rules List", 'overwriterules.json', 'JSON Files (*.json)', options=options)
         if fileName:
             self.ueMng.exportUEList(fileName)
-            # showInfo(fileName) 
 
 
     def importRules(self):
@@ -424,17 +413,7 @@ class JSGui(QWidget):
             importButton.clicked.connect(lambda: self.ruleListImport(self.importW, fileName, combineRB.isChecked(), ovCollideRB.isChecked()))
             self.importW.show()
 
-    def clearRulesTable(self):
-        #testing
-        return
-        self.ui.rulesTable.setRowCount(0)
-
-
-
-# if the value is the same don't trigger edit event
     def ruleListImport(self, window, fileName, combine, overwriteCollides):
-        #testing
-        # return
         imported = self.ueMng.importUEList(fileName, combine, overwriteCollides) 
         if imported is not False:
             if not combine:
@@ -444,7 +423,6 @@ class JSGui(QWidget):
                     showInfo(str(imported[0]) +' rules have been imported.<br>' + str(imported[1]) + ' rules have been overwritten.', title="MIA Japanese Support Notice")
                 else:
                     showInfo(str(imported[0]) +' rules have been imported.<br>' + str(imported[1]) + ' rules have been ignored because they conflicted with existing rules.', title="MIA Japanese Support Notice")
-            # self.clearRulesTable()
             self.ueMng.setupModel(self)
             self.ui.rulesTable.setModel(self.ueMng.model)
             self.ueMng.model.ascendingOrder()
@@ -466,8 +444,6 @@ class JSGui(QWidget):
         self.hide()
 
     def openDialogColor(self, lineEd):
-        # main = QColorDialog(self)
-        # # main.setWindowIcon(QIcon(join(addon_path, 'mia.png')))
         color = QColorDialog.getColor(parent=self)
         if color.isValid():
             lineEd.setText(color.name())

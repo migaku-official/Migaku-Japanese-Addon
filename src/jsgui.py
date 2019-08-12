@@ -555,7 +555,10 @@ class Ui_Dialog(object):
         tableHeader.setSectionResizeMode(4, QtWidgets.QHeaderView.Stretch)
         tableHeader.setSectionResizeMode(5, QtWidgets.QHeaderView.Stretch)
         tableHeader.setSectionResizeMode(6, QtWidgets.QHeaderView.Fixed)
-        self.listWidget.setColumnWidth(6, 20)
+        if macLin:
+            self.listWidget.setColumnWidth(6, 40)
+        else:
+            self.listWidget.setColumnWidth(6, 20)
         self.listWidget.setObjectName("listWidget")
         self.listWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
         self.gridLayout.addWidget(self.listWidget, 3, 0, 1, 6)
@@ -681,6 +684,7 @@ class Ui_Dialog(object):
         self.verticalLayout_2.addWidget(self.groupBox_9)
         self.groupBox_3 = QtWidgets.QGroupBox(self.tab_3)
         self.groupBox_3.setObjectName("groupBox_3")
+        self.groupBox_3.setFixedHeight(60)
         self.importRules = QtWidgets.QPushButton(self.groupBox_3)
         self.importRules.setGeometry(QtCore.QRect(60, 25, 190, 28))
         self.importRules.setObjectName("importRules")
