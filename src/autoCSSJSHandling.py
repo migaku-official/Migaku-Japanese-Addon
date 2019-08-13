@@ -173,9 +173,10 @@ class AutoCSSJSHandler:
             if len(varAr) not in [2,3]:
                 syntaxErrors += '\nThe "' + variant + '" configuration "'+ config[variant] +'" is incorrect. The syntax is invalid.'
             else:
-                for field in varAr[0].split(','):
-                    if field.lower() not in ['clipboard' , 'none'] and not self.fieldExists(field):
-                        syntaxErrors += '\nThe "' + variant + '" configuration "'+ config[variant] +'" is incorrect. The "' + field + '" does not exist in your collection.'    
+                fields =  varAr[0].split(',')
+                for field in fields:
+                    if field.lower() not in ['clipboard' , 'none', ''] and not self.fieldExists(field):
+                        syntaxErrors += '\nThe "' + variant + '" configuration "'+ config[variant] +'" is incorrect. The "' + field + '" field does not exist in your collection.'    
                         fieldErrors.append(field)
                 if varAr[1].lower() not in ['overwrite', 'add', 'no']:
                     syntaxErrors += '\nThe "' + variant + '" configuration "'+ config[variant] +'" is incorrect. Please ensure that second value is either "overwrite", "add", or "no".'    

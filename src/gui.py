@@ -106,15 +106,7 @@ class JSGui(QScrollArea):
         tableHeader2 = rt.horizontalHeader()
         tableHeader2.setSectionResizeMode(0, QHeaderView.Stretch)
         tableHeader2.setSectionResizeMode(1, QHeaderView.Stretch)
-        # tableHeader2.setSectionResizeMode(2, QHeaderView.Fixed)
-        # rt.setColumnWidth(2, 20)
-    # def customContextMenu(self, event):
-    #     menu = QMenu(self)
-    #     quitAction = menu.addAction("Quit")
 
-    #     action = menu.popup(self.mapToGlobal(event.pos()))
-    #     if action == quitAction:
-    #         showInfo('success')
     def customContextMenu(self, event):
         rows = self.ui.rulesTable.selectionModel().selectedRows()
         length = len(rows)
@@ -125,22 +117,13 @@ class JSGui(QScrollArea):
             x = pos.x() + 20
             y = pos.y() + 115
             action = menu.exec_(self.mapToGlobal(QPoint(x, y)))
-            # position = menu.pos()
-            # menu.move(position.x() + 20, position.y()+ 120)
-            # menu.move(event.pos().x(), event.pos().y() - 100)
             if action == delete:
                 self.removeMultipleRules(rows, str(length))
 
     def removeMultipleRules(self, rows, length):
         if askUser('Are you sure you would like to remove the ' + length + ' rules that are selected from the overwrite rule list?'):
-            # for row in reversed(rows):
-            #     self.deleteRuleAtRow(row.row())
             self.ui.rulesTable.setSortingEnabled(False)
-            # original = self.ui.rulesTable.item(row, 0).text()
-            # self.ueMng.deleteRule(original)
             self.ueMng.model.removeRows(rows[0].row(), len(rows))
-            # self.ui.rulesTable.removeRow(row)
-            # self.ueMng.saveUEList()
             self.updateRuleCounter()
             self.ui.rulesTable.setSortingEnabled(True)
             
@@ -162,13 +145,7 @@ class JSGui(QScrollArea):
             self.ui.originalLE.setText('')
             self.ui.overwriteLE.setText('')
             self.ui.searchRulesLE.setText('')
-
-            # self.ui.rulesTable.setSortingEnabled(False)
-            # self.addRuleToList(original, overwrite)
-            # self.ui.rulesTable.setSortingEnabled(True)
-            
             self.updateRuleCounter()
-            
             if addId is not False:
                 addIdx = self.ueMng.model.index(addId, 0)
                 self.ui.rulesTable.scrollTo(addIdx)
@@ -210,8 +187,6 @@ class JSGui(QScrollArea):
         innerWidget = QWidget(self.arMenu)
         innerWidget.setGeometry(QRect(-3, 0, 275,40))
         innerWidget.setLayout(hLayout)
-
-        # .addWidget(gb)
         applyButton = QPushButton('Yes', self.arMenu)
         cancelButton = QPushButton('No', self.arMenu)
         applyButton.setGeometry(QRect(135, 40, 80, 32))
@@ -665,8 +640,14 @@ class JSGui(QScrollArea):
         return [self.ui.heibanColor.text(), self.ui.atamadakaColor.text(), self.ui.nakadakaColor.text(), self.ui.odakaColor.text(), self.ui.kifukuColor.text()]
 
     def saveAudioGraphsConfig(self):
-        audioConfig = [ ','.join(self.selectedAudioFields)]
-        graphConfig = [ ','.join(self.selectedGraphFields)]
+        if len(self.selectedAudioFields) < 1:
+            audioConfig = ['none']
+        else:
+            audioConfig = [ ','.join(self.selectedAudioFields)]
+        if len(self.selectedGraphFields) < 1:
+            graphConfig = ['none']
+        else:
+            graphConfig = [ ','.join(self.selectedGraphFields)]
         if self.ui.audioAdd.isChecked():
             audioConfig.append('add')
             audioConfig.append(self.ui.audioSep.text())
@@ -1093,7 +1074,7 @@ class JSGui(QScrollArea):
         for idx, field in enumerate(fields):
             if field == 'clipboard':
                 fields[idx] = 'Clipboard'
-        if len(fields) == 1 and fields[0].lower() == 'none':
+        if len(fields) == 1 and (fields[0].lower() == 'none' or fields[0].lower() == ''):
             fl.setText('<i>None currently selected.</i>')
         else:
             fl.setText('<i>' + ', '.join(fields) +'</i>')
@@ -1137,7 +1118,7 @@ class JSGui(QScrollArea):
                 vList.remove(value)
                 lWidget.setText(', '.join(vList))
                 button.setText('Add')
-                if len(vList) == 0:
+                if len(vList) == 0 or (len(vList) == 1 and vList[0].lower() == 'none'):
                     lWidget.setText('<i>None currently selected.</i>')
         else:
             if profiles and value == 'All':
@@ -1149,6 +1130,8 @@ class JSGui(QScrollArea):
                 if profiles:
                     if 'All' in vList:
                         vList.remove('All')
+                if len(vList) == 1 and (vList[0].lower() == 'none' or vList[0] == ''):
+                    vList.remove(vList[0])
                 vList.append(value)
                 lWidget.setText('<i>'+ ', '.join(vList) + '</i>')
                 button.setText('Remove')
