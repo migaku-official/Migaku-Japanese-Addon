@@ -312,12 +312,6 @@ class JSGui(QScrollArea):
         self.ui.yogaTW.clicked.connect(lambda: openLink('https://twitter.com/Yoga_MIA'))
         self.ui.gitHubIcon.clicked.connect(lambda: openLink('https://github.com/mass-immersion-approach'))
 
-
-
-
-
-
-
     def initRuleSearch(self):
         text = self.ui.searchRulesLE.text()
         if text == '':

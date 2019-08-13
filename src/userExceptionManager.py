@@ -6,12 +6,13 @@ from . import Pyperclip
 from os.path import join, exists
 from shutil import copyfile
 from aqt.addcards import AddCards
-from aqt.utils import  showInfo, askUser
+from aqt.utils import  askUser
 from .addgui import Ui_Form
 from aqt.qt import *
 from aqt.editor import Editor
 import anki.find
 import codecs
+from .miutils import miInfo
 
 class OgOvFilter(QSortFilterProxyModel):
     def __init__(self, model, parent = None):
@@ -168,10 +169,10 @@ class RulesModel(QAbstractTableModel):
 
     def checkRuleValidity(self, a, b):
         if a == b:
-            showInfo('The original text and overwrite text cannot be the same.')
+            miInfo('The original text and overwrite text cannot be the same.')
             return False
         elif a == '':
-            showInfo('A rule must be at least one character long.')
+            miInfo('A rule must be at least one character long.')
             return False
         return True
                  
@@ -246,10 +247,10 @@ class UserExceptionManager:
 
     def addRule(self, original, overwrite, newCards, learnedCards, parentWidget, addMenu = False):
         if original == '' or overwrite == '':
-            showInfo('The original and overwrite fields should not be empty.', title="MIA Japanese Support Notice")
+            miInfo('The original and overwrite fields should not be empty.', level='not')
             return False, False;
         if original == overwrite:
-            showInfo('The original and overwrite fields should not contain the same text.', title="MIA Japanese Support Notice")
+            miInfo('The original and overwrite fields should not contain the same text.', level='not')
             return False, False;
         foundId = self.ruleExists(original)
         edit = False
@@ -275,7 +276,7 @@ class UserExceptionManager:
         for idx, ogOv in enumerate(self.ueList):
             if original == ogOv[0]:
                 if message:
-                    showInfo('A rule with this original value already exists ("' + original +'" => "' + self.ueList[idx][1] + '""), please ensure that you are defining a unique value.', title="MIA Japanese Support Error")
+                    miInfo('A rule with this original value already exists ("' + original +'" => "' + self.ueList[idx][1] + '""), please ensure that you are defining a unique value.', level='err')
                 return idx
         return False
 
@@ -365,7 +366,7 @@ class UserExceptionManager:
             self.mw.app.processEvents()            
         self.mw.reset()
         progWid.hide()
-        showInfo('Rule(s) have been applied ' + str(appliedRules) + ' times.<br>' + str(altered) + ' notes have been altered.' , parent = parentWidget, title="MIA Japanese Support Notice")
+        miInfo('Rule(s) have been applied ' + str(appliedRules) + ' times.<br>' + str(altered) + ' notes have been altered.' , parent = parentWidget, level='not')
     
     def applyRulesToText(self, text):
         for ogOv in self.ueList:
@@ -390,12 +391,12 @@ class UserExceptionManager:
                 ignoredOrOverwritten = 0
                 for ogOv in newList:
                     if len(ogOv) != 2:
-                        showInfo('The overwrite rules list could not be imported. Please make sure the target file is a valid overwrite rules list and try again.', title="MIA Japanese Support Error")
+                        miInfo('The overwrite rules list could not be imported. Please make sure the target file is a valid overwrite rules list and try again.', level='err')
                         return False
                     original = ogOv[0]  
                     overwrite = ogOv[1]
                     if not isinstance(original, str) or not isinstance(overwrite, str):
-                        showInfo('The overwrite rules list could not be imported. Please make sure the target file is a valid overwrite rules list and try again.', title="MIA Japanese Support Error")
+                        miInfo('The overwrite rules list could not be imported. Please make sure the target file is a valid overwrite rules list and try again.', level='err')
                         return False
                     if overwriteCollides:
                         if original in dictUEList:
@@ -419,15 +420,15 @@ class UserExceptionManager:
          
                 return [len(self.ueList), 0]
         except:
-            showInfo('The overwrite rules list could not be imported. Please make sure the target file is a valid overwrite rules list and try again.', title="MIA Japanese Support Error")
+            miInfo('The overwrite rules list could not be imported. Please make sure the target file is a valid overwrite rules list and try again.', level='err')
             return False
     
     def getConfig(self):
         return self.mw.addonManager.getConfig(__name__)
 
     def exportUEList(self, fileName): #allow user to save a copy of their list where they want
+        if not fileName.endswith('.json'):
+            fileName += '.json'
         with open(fileName, 'w') as outfile:
             json.dump(self.ueList, outfile)
-        showInfo('The overwrite rules list has been exported to "' + fileName +'"', title="MIA Japanese Support Notice")
-
-
+        miInfo('The overwrite rules list has been exported to "' + fileName +'"', level='not')

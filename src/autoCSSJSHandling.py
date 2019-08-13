@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 # 
 from os.path import join
-from aqt.utils import showInfo, askUser
+from aqt.utils import askUser
+from .miutils import miInfo
 import re
 
 class AutoCSSJSHandler:
@@ -101,12 +102,12 @@ class AutoCSSJSHandler:
         if converter == "off" and kConfig == "off":
             self.removeKanaOldJs();       
         if kConfig not in ['on', 'off']:
-            showInfo('"KatakanaConversion" has an invalid value in the config. Ensure that its value is either "on" or "off".', title="MIA Japanese Support Error")
+            miInfo('"KatakanaConversion" has an invalid value in the config. Ensure that its value is either "on" or "off".', level="err")
             return False
         elif kConfig  == 'on':
             katakana = 'true'        
         if converter not in ['both', 'kanji', 'kana', 'off']:
-            showInfo('"HistoricalConversion" has an invalid value in the config. Ensure that its value is one of the following: "both/kanji/kana/off".', title="MIA Japanese Support Error")
+            miInfo('"HistoricalConversion" has an invalid value in the config. Ensure that its value is one of the following: "both/kanji/kana/off".', level="err")
             return False
         elif converter in ['both', 'kanji', 'kana']:
             converterJS = self.getHistoricalConverterJs(converter, katakana)
@@ -183,7 +184,7 @@ class AutoCSSJSHandler:
                 if askUser('Please make sure the syntax is as follows "field,field;type(;separator)". The syntax is incorrect for the following entries:' + syntaxErrors + '\n\n Would you like to delete these fields from you configuration?', title="MIA Japanese Support Error"):
                     self.deletePitchAudioFields(fieldErrors, config)
             else:
-                showInfo('Please make sure the syntax is as follows "field,field;type(;separator)". The syntax is incorrect for the following entries:' + syntaxErrors, title="MIA Japanese Support Error")
+                miInfo('Please make sure the syntax is as follows "field,field;type(;separator)". The syntax is incorrect for the following entries:' + syntaxErrors, level="err")
             return False
         return True
 
@@ -194,6 +195,8 @@ class AutoCSSJSHandler:
             for field in fields:
                 if field in currentFields:
                     currentFields.remove(field)
+            if len(currentFields) < 1:
+                currentFields.append('none')
             config[variant] = ','.join(currentFields) + ';' + varAr[1] 
             if len(varAr) > 2:
                 config[variant] += ';' +  varAr[2]
@@ -248,16 +251,16 @@ class AutoCSSJSHandler:
 
     def checkWrapperDictErrors(self, syntaxErrors, displayTypeError, notFoundErrors, fieldConflictErrors,  wrapperDict):
         if syntaxErrors != '':
-            showInfo('The following entries have incorrect syntax:\nPlease make sure the format is as follows:\n"displayType;profileName;noteTypeName;cardTypeName;fieldName;side(;ReadingType)".\n' + syntaxErrors, title="MIA Japanese Support Error")
+            miInfo('The following entries have incorrect syntax:\nPlease make sure the format is as follows:\n"displayType;profileName;noteTypeName;cardTypeName;fieldName;side(;ReadingType)".\n' + syntaxErrors, level="err")
             return (wrapperDict, False);
         if displayTypeError != '':
-            showInfo('The following entries have an incorrect display type. Valid display types are "Hover", "ColoredHover", "Kanji", "ColoredKanji", "KanjiReading", "ColoredKanjiReading", "Reading", and "ColoredReading".\n' + syntaxErrors, title="MIA Japanese Support Error")  
+            miInfo('The following entries have an incorrect display type. Valid display types are "Hover", "ColoredHover", "Kanji", "ColoredKanji", "KanjiReading", "ColoredKanjiReading", "Reading", and "ColoredReading".\n' + syntaxErrors, level="err")  
             return (wrapperDict, False);
         if notFoundErrors != '':
-            showInfo('The following entries have incorrect values that are not found in your currently loaded Anki profile. Please note that this is not necessarily an error, if these fields or note types may exist within your other Anki profiles.\n\n' + notFoundErrors, title="MIA Japanese Support Warning")
+            miInfo('The following entries have incorrect values that are not found in your currently loaded Anki profile. Please note that this is not necessarily an error, if these fields or note types may exist within your other Anki profiles.\n\n' + notFoundErrors, level="wrn")
             return (wrapperDict, False);
         if fieldConflictErrors != '':
-            showInfo('You have entries that point to the same field and the same side. Please make sure that a field and side combination does not conflict.\n\n' + fieldConflictErrors, title="MIA Japanese Support Error")
+            miInfo('You have entries that point to the same field and the same side. Please make sure that a field and side combination does not conflict.\n\n' + fieldConflictErrors, level="err")
             return (wrapperDict, False);
         return (wrapperDict, True);
 
