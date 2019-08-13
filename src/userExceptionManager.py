@@ -376,8 +376,13 @@ class UserExceptionManager:
                 text = text.replace(original, overwrite)
         return text          
 
-    def saveUEList(self):  #saves UE List to file    
-        self.model.saveList(self.listPath)
+    def saveUEList(self):  #saves UE List to file
+        if not self.model: 
+            ueList = self.ueList
+            with codecs.open(self.listPath, "w","utf-8") as outfile:
+                json.dump(ueList, outfile, ensure_ascii=False) 
+        else:
+            self.model.saveList(self.listPath)
 
     def importUEList(self, fileName, combine, overwriteCollides):  #imports new list overwrite if desired
         try:

@@ -14,6 +14,7 @@ import json
 from aqt import mw
 from aqt.qt import *
 import copy
+from .miutils import miInfo
 from anki import sound
 from anki.find import Finder
 from anki import Collection
@@ -156,18 +157,21 @@ def loadAllProfileInformation():
     global colArray
     for prof in mw.pm.profiles():
         cpath = join(mw.pm.base, prof,  'collection.anki2')
-        tempCol = Collection(cpath)
-        noteTypes = tempCol.models.all()
-        tempCol.db.close()
-        tempCol = None
-        noteTypeDict = {}
-        for note in noteTypes:
-            noteTypeDict[note['name']] = {"cardTypes" : [], "fields" : []}
-            for ct in note['tmpls']:
-                noteTypeDict[note['name']]["cardTypes"].append(ct['name'])
-            for f in note['flds']:
-                noteTypeDict[note['name']]["fields"].append(f['name'])
-        colArray[prof] = noteTypeDict
+        try:
+            tempCol = Collection(cpath)
+            noteTypes = tempCol.models.all()
+            tempCol.db.close()
+            tempCol = None
+            noteTypeDict = {}
+            for note in noteTypes:
+                noteTypeDict[note['name']] = {"cardTypes" : [], "fields" : []}
+                for ct in note['tmpls']:
+                    noteTypeDict[note['name']]["cardTypes"].append(ct['name'])
+                for f in note['flds']:
+                    noteTypeDict[note['name']]["fields"].append(f['name'])
+            colArray[prof] = noteTypeDict
+        except:
+            miInfo('<b>Warning:</b><br>Your Anki collection could not be loaded, as a result the MIA Japanese Support Add-on settings menu will not work correctly. This problem typically occurs when creating a new Anki profile. You can <b>fix this issue by simply restarting Anki after loading your new profile for the first time.<b>', level='wrn')
 
 def openGui():
     global gui
