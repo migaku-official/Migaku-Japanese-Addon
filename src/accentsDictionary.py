@@ -30,7 +30,7 @@ class AccentsDictionary:
     def getDict(self):
         accentDictionary = []
         dictionary = {}
-        for x in range(1, 8):
+        for x in range(1, 9):
             accentDictionaryPath = join(self.addon_path, "dict", "compAccDict" + str(x) + "_.json")
             with open(accentDictionaryPath, "r", encoding="utf-8") as accentDictionaryFile:
                 accentDictionary += json.loads(accentDictionaryFile.read())
