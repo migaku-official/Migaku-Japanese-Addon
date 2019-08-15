@@ -61,7 +61,7 @@ config = mw.addonManager.getConfig(__name__)
 currentNote = False 
 currentField = False
 currentKey = False
-
+mw.MIAJSSettings = None
 undo = join(addon_path, "js", "undo.js")
 with open(undo, "r", encoding="utf-8") as undoFile:
     undoJS= undoFile.read() 
@@ -174,10 +174,12 @@ def loadAllProfileInformation():
             miInfo('<b>Warning:</b><br>Your Anki collection could not be loaded, as a result the MIA Japanese Support Add-on settings menu will not work correctly. This problem typically occurs when creating a new Anki profile. You can <b>fix this issue by simply restarting Anki after loading your new profile for the first time.<b>', level='wrn')
 
 def openGui():
-    global gui
-    gui = JSGui(mw, colArray, MIAModel, openGui, CSSJSHandler, UEManager)
-    gui.show()
-    gui.setFocus()
+    if not mw.MIAJSSettings:
+        mw.MIAJSSettings = JSGui(mw, colArray, MIAModel, openGui, CSSJSHandler, UEManager)
+    mw.MIAJSSettings.show()
+    mw.MIAJSSettings.setFocus()
+    mw.MIAJSSettings.activateWindow()
+
      
 def setupGuiMenu():
     addMenu = False

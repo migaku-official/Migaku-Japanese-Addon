@@ -160,6 +160,7 @@ class JSGui(QScrollArea):
             self.arMenu.hide()
         if self.importW:
             self.importW.hide()
+        self.mw.MIAJSSettings = None
         event.accept() 
 
     def hideEvent(self, event):
@@ -379,7 +380,8 @@ class JSGui(QScrollArea):
             laiCollideRB.setEnabled(False)
             overwriteRB.clicked.connect(lambda: self.toggleImportOpts(combineRB.isChecked(), ovCollideRB, laiCollideRB))
             combineRB.clicked.connect(lambda: self.toggleImportOpts(combineRB.isChecked(), ovCollideRB, laiCollideRB))
-            importButton.clicked.connect(lambda: self.ruleListImport(self.importW, fileName, combineRB.isChecked(), ovCollideRB.isChecked()))
+            importButton.clicked.connect(lambda: self.ruleListImport(self.importW, 
+                fileName, combineRB.isChecked(), ovCollideRB.isChecked()))
             self.importW.show()
 
     def ruleListImport(self, window, fileName, combine, overwriteCollides):
@@ -411,6 +413,7 @@ class JSGui(QScrollArea):
 
     def exit(self):
         self.hide()
+        
 
     def openDialogColor(self, lineEd):
         color = QColorDialog.getColor(parent=self)
@@ -601,6 +604,8 @@ class JSGui(QScrollArea):
         mw.addonManager.writeConfig(__name__, newConf)
         self.CSSJSHandler.injectWrapperElements()
         self.hide()
+
+
 
     def saveHistoricalConversion(self):
         if self.ui.historicalKana.isChecked() and self.ui.historicalKanji.isChecked():
