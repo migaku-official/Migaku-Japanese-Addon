@@ -17,6 +17,7 @@ exceptionDict = {
 "禿": "はげ",
 "昼食": "ちゅうしょく",
 "道": "みち",
+"生の": False,
 "何を": False,
 "感染す": False,
 "頭がい": False,
