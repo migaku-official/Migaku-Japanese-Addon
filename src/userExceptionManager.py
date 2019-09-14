@@ -6,13 +6,12 @@ from . import Pyperclip
 from os.path import join, exists
 from shutil import copyfile
 from aqt.addcards import AddCards
-from aqt.utils import  askUser
 from .addgui import Ui_Form
 from aqt.qt import *
 from aqt.editor import Editor
 import anki.find
 import codecs
-from .miutils import miInfo
+from .miutils import miInfo, miAsk
 
 class OgOvFilter(QSortFilterProxyModel):
     def __init__(self, model, parent = None):
@@ -255,7 +254,7 @@ class UserExceptionManager:
         foundId = self.ruleExists(original)
         edit = False
         if foundId is not False:
-            if not askUser('The rule "' + original + '" => "' + self.ueList[foundId][1] +'" already overwrites the given text. Would you like to overwrite it with your new rule?', title="MIA Japanese Support Add-on"):
+            if not miAsk('The rule "' + original + '" => "' + self.ueList[foundId][1] +'" already overwrites the given text. Would you like to overwrite it with your new rule?'):
                 return False, False
             else:
                 edit = True
@@ -369,6 +368,7 @@ class UserExceptionManager:
         miInfo('Rule(s) have been applied ' + str(appliedRules) + ' times.<br>' + str(altered) + ' notes have been altered.' , parent = parentWidget, level='not')
     
     def applyRulesToText(self, text):
+        
         for ogOv in self.ueList:
             original = ogOv[0] 
             overwrite = ogOv[1]
@@ -435,5 +435,5 @@ class UserExceptionManager:
         if not fileName.endswith('.json'):
             fileName += '.json'
         with open(fileName, 'w') as outfile:
-            json.dump(self.ueList, outfile)
+            json.dump(self.ueList, outfile, ensure_ascii=False)
         miInfo('The overwrite rules list has been exported to "' + fileName +'"', level='not')

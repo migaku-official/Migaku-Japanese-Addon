@@ -6,7 +6,8 @@ import sys
 import math
 from anki.hooks import addHook
 from aqt.qt import *
-from aqt.utils import openLink, tooltip, showInfo, askUser
+from aqt.utils import openLink, tooltip
+from .miutils import miInfo, miAsk
 from anki.utils import isMac, isWin, isLin
 from anki.lang import _
 from aqt.webview import AnkiWebView
@@ -71,7 +72,7 @@ class JSGui(QScrollArea):
 
     def setInitialValues(self):
         self.setWindowIcon(QIcon(join(addon_path, 'icons', 'mia.png')))
-        self.setWindowTitle("Japanese Support Settings")
+        self.setWindowTitle("Japanese Settings")
         self.cont.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         self.cont.setFixedSize(1167, 725)
         self.setWidget(self.cont)
@@ -121,7 +122,7 @@ class JSGui(QScrollArea):
                 self.removeMultipleRules(rows, str(length))
 
     def removeMultipleRules(self, rows, length):
-        if askUser('Are you sure you would like to remove the ' + length + ' rules that are selected from the overwrite rule list?'):
+        if miAsk('Are you sure you would like to remove the ' + length + ' rules that are selected from the overwrite rule list?'):
             self.ui.rulesTable.setSortingEnabled(False)
             self.ueMng.model.removeRows(rows[0].row(), len(rows))
             self.updateRuleCounter()
@@ -229,7 +230,7 @@ class JSGui(QScrollArea):
 
 
     def restoreDefaultConfig(self):
-        if askUser('Are you sure you would like to restore the default settings?'):
+        if miAsk('Are you sure you would like to restore the default settings?'):
             conf = mw.addonManager.addonConfigDefaults(dirname(__file__))
             mw.addonManager.writeConfig(__name__, conf)
             self.close()
@@ -388,12 +389,12 @@ class JSGui(QScrollArea):
         imported = self.ueMng.importUEList(fileName, combine, overwriteCollides) 
         if imported is not False:
             if not combine:
-                showInfo(str(imported[0]) +' rules have been imported.', title="MIA Japanese Support Notice")
+                miInfo(str(imported[0]) +' rules have been imported.', level = 'not')
             else:
                 if overwriteCollides:
-                    showInfo(str(imported[0]) +' rules have been imported.<br>' + str(imported[1]) + ' rules have been overwritten.', title="MIA Japanese Support Notice")
+                    miInfo(str(imported[0]) +' rules have been imported.<br>' + str(imported[1]) + ' rules have been overwritten.', level = 'not')
                 else:
-                    showInfo(str(imported[0]) +' rules have been imported.<br>' + str(imported[1]) + ' rules have been ignored because they conflicted with existing rules.', title="MIA Japanese Support Notice")
+                    miInfo(str(imported[0]) +' rules have been imported.<br>' + str(imported[1]) + ' rules have been ignored because they conflicted with existing rules.', level = 'not')
             self.ueMng.setupModel(self)
             self.ui.rulesTable.setModel(self.ueMng.model)
             self.ueMng.model.ascendingOrder()
@@ -549,8 +550,8 @@ class JSGui(QScrollArea):
         rc = self.selectedRow
         found = self.dupeRow(afList, profile, nt, ct, field, side, dt, rc)
         if found:
-            showInfo('This row cannot be edited in this manner because row #' + str(found) + 
-                ' in the Active Fields List already targets this given field and side combination. Please review that entry and try again.', title="MIA Japanese Support Error")
+            miInfo('This row cannot be edited in this manner because row #' + str(found) + 
+                ' in the Active Fields List already targets this given field and side combination. Please review that entry and try again.', level = 'err')
         else:
             afList.setSortingEnabled(False)
             
@@ -601,7 +602,7 @@ class JSGui(QScrollArea):
          }
         if self.addMIANoteTypeOnApply:
             self.MIAModel.addModels() 
-        mw.addonManager.writeConfig(__name__, newConf)
+        self.mw.addonManager.writeConfig(__name__, newConf)
         self.CSSJSHandler.injectWrapperElements()
         self.hide()
 
@@ -825,8 +826,8 @@ class JSGui(QScrollArea):
         afList = self.ui.listWidget
         found = self.dupeRow(afList, profile, nt, ct, field, side, dt)
         if found:
-            showInfo('This row cannot be added because row #' + str(found) + 
-                ' in the Active Fields List already targets this given field and side combination. Please review that entry and try again.', title="MIA Japanese Support Error")
+            miInfo('This row cannot be added because row #' + str(found) + 
+                ' in the Active Fields List already targets this given field and side combination. Please review that entry and try again.', level = 'err')
         else:
             afList.setSortingEnabled(False)
             rc = afList.rowCount()
@@ -844,7 +845,7 @@ class JSGui(QScrollArea):
             afList.setSortingEnabled(True)
 
     def removeRow(self):
-        if askUser('Are you sure you would like to remove this entry from the active field list?'):
+        if miAsk('Are you sure you would like to remove this entry from the active field list?'):
             self.ui.listWidget.removeRow(self.ui.listWidget.selectionModel().currentIndex().row())
             self.resetButton()
 

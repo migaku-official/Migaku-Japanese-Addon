@@ -54,9 +54,9 @@ mecabReading = reading.MecabController()
 mecabAccents = reading.MecabController()
 UEManager = UserExceptionManager(mw, addon_path)  
 AccentDict = AccentsDictionary(addon_path, counterDict, potentialToKihonkei, adjustedDict, conditionalYomi, readingOnlyDict, exceptionDict, sameYomiDifferentAccent, suffixDict)
-Exporter = AccentExporter(mw, aqt, UEManager, AccentDict, addon_path, adjustVerbs, separateWord, separateVerbPhrase, ignoreVerbs, dontCombineDict, skipList, parseWithMecab, verbToNoun, mecabAccents, mecabReading)
-MExporter = MassExporter(mw, Exporter, addon_path)
-CSSJSHandler = AutoCSSJSHandler(mw, addon_path)
+mw.Exporter = AccentExporter(mw, aqt, UEManager, AccentDict, addon_path, adjustVerbs, separateWord, separateVerbPhrase, ignoreVerbs, dontCombineDict, skipList, parseWithMecab, verbToNoun)
+MExporter = MassExporter(mw, mw.Exporter, addon_path)
+mw.CSSJSHandler = AutoCSSJSHandler(mw, addon_path)
 config = mw.addonManager.getConfig(__name__)
 currentNote = False 
 currentField = False
@@ -81,9 +81,9 @@ def setupShortcuts(shortcuts, editor):
         return shortcuts
     config = mw.addonManager.getConfig(__name__)
     keys = []
-    keys.append({ "hotkey": "F2", "name" : 'extra', 'function' : lambda  editor=editor: Exporter.groupExport(editor)})
-    keys.append({ "hotkey": "F3", "name" : 'extra', 'function' : lambda  editor=editor: Exporter.individualExport(editor)})
-    keys.append({ "hotkey": "F4", "name" : 'extra', 'function' : lambda  editor=editor: Exporter.cleanField(editor)})
+    keys.append({ "hotkey": "F2", "name" : 'extra', 'function' : lambda  editor=editor: mw.Exporter.groupExport(editor)})
+    keys.append({ "hotkey": "F3", "name" : 'extra', 'function' : lambda  editor=editor: mw.Exporter.individualExport(editor)})
+    keys.append({ "hotkey": "F4", "name" : 'extra', 'function' : lambda  editor=editor: mw.Exporter.cleanField(editor)})
     keys.append({ "hotkey": "F5", "name" : 'extra', 'function' : lambda  editor=editor:  UEManager.openAddMenu(editor)})
     newKeys = shortcuts;
     for key in keys:
@@ -96,8 +96,8 @@ def setupShortcuts(shortcuts, editor):
 def setupButtons(righttopbtns, editor):
   if not checkProfile():
     return righttopbtns  
-  editor._links["individualExport"] = lambda editor: Exporter.individualExport(editor)
-  editor._links["cleanField"] = lambda editor: Exporter.cleanField(editor)
+  editor._links["individualExport"] = lambda editor: mw.Exporter.individualExport(editor)
+  editor._links["cleanField"] = lambda editor: mw.Exporter.cleanField(editor)
   editor._links["openUserExceptionsAdder"] = UEManager.openAddMenu
   iconPath = os.path.join(addon_path, "icons", "userexceptions.svg")
   righttopbtns.insert(0, editor._addButton(
@@ -120,7 +120,7 @@ def setupButtons(righttopbtns, editor):
                 tip="Hotkey: F3",
                 id=u"語"
             ))  
-  editor._links["groupExport"] = lambda editor: Exporter.groupExport(editor)
+  editor._links["groupExport"] = lambda editor: mw.Exporter.groupExport(editor)
   iconPath = os.path.join(addon_path, "icons", "bun.svg")
   righttopbtns.insert(0, editor._addButton(
                 icon= iconPath,
@@ -171,12 +171,15 @@ def loadAllProfileInformation():
                     noteTypeDict[note['name']]["fields"].append(f['name'])
             colArray[prof] = noteTypeDict
         except:
-            miInfo('<b>Warning:</b><br>Your Anki collection could not be loaded, as a result the MIA Japanese Support Add-on settings menu will not work correctly. This problem typically occurs when creating a new Anki profile. You can <b>fix this issue by simply restarting Anki after loading your new profile for the first time.<b>', level='wrn')
+            miInfo('<b>Warning:</b><br>Your Anki collection could not be loaded, as a result the MIA Japanese Add-on settings menu will not work correctly. This problem typically occurs when creating a new Anki profile. You can <b>fix this issue by simply restarting Anki after loading your new profile for the first time.<b>', level='wrn')
 
 def openGui():
     if not mw.MIAJSSettings:
-        mw.MIAJSSettings = JSGui(mw, colArray, MIAModel, openGui, CSSJSHandler, UEManager)
+        mw.MIAJSSettings = JSGui(mw, colArray, MIAModel, openGui, mw.CSSJSHandler, UEManager)
     mw.MIAJSSettings.show()
+    if mw.MIAJSSettings.windowState() == Qt.WindowMinimized:
+            # Window is minimised. Restore it.
+           mw.MIAJSSettings.setWindowState(Qt.WindowNoState)
     mw.MIAJSSettings.setFocus()
     mw.MIAJSSettings.activateWindow()
 
@@ -186,7 +189,7 @@ def setupGuiMenu():
     if not hasattr(mw, 'MIAMenu'):
         mw.MIAMenu = QMenu('MIA | Settings',  mw)
         addMenu = True
-    setting = QAction("Japanese Support Settings", mw.MIAMenu)
+    setting = QAction("Japanese Settings", mw.MIAMenu)
     setting.triggered.connect(openGui)
     mw.MIAMenu.addAction(setting)
     if addMenu:
@@ -226,7 +229,7 @@ addHook("browser.setupMenus", setupMenu)
 addHook("browser.setupMenus", setupMenu)
 addHook("profileLoaded", UEManager.getUEList)
 addHook("profileLoaded", accentGraphCss)
-addHook("profileLoaded", CSSJSHandler.injectWrapperElements)    
+addHook("profileLoaded", mw.CSSJSHandler.injectWrapperElements)    
 addHook("setupEditorButtons", setupButtons)
 addHook("setupEditorShortcuts", setupShortcuts)
 
@@ -247,7 +250,7 @@ def supportAccept(self):
         act = self.mgr.configUpdatedAction(self.addon)
         if act:
             act(new_conf)
-        if not CSSJSHandler.injectWrapperElements():
+        if not mw.CSSJSHandler.injectWrapperElements():
             return
 
     saveGeom(self, "addonconf")
@@ -298,13 +301,13 @@ def bridgeReroute(self, cmd):
             splitList = cmd.split(':||:||:')
             if self.note.id == int(splitList[3]):
                 field = getFieldName(splitList[2], self.note)
-                Exporter.finalizeGroupExport(self, splitList[1], field, self.note)
+                mw.Exporter.finalizeGroupExport(self, splitList[1], field, self.note)
             return
         elif cmd.startswith('individualJExport'):
             splitList = cmd.split(':||:||:')
             if self.note.id == int(splitList[3]):
                 field = getFieldName(splitList[2], self.note)
-                Exporter.finalizeIndividualExport(self, splitList[1], field, self.note)
+                mw.Exporter.finalizeIndividualExport(self, splitList[1], field, self.note)
             return
         elif cmd.startswith('attemptUndo'):
             name = mw.col.undoName()

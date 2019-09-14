@@ -2,7 +2,7 @@
 # 
 from aqt.qt import *
 import re
-from aqt.utils import askUser
+from .miutils import miInfo,  miAsk
 from os.path import join
 
 class MassExporter:
@@ -19,6 +19,7 @@ class MassExporter:
         if notes:
             fields = anki.find.fieldNamesForNotes(self.mw.col, notes)
             generateWidget = QDialog(None, Qt.Window)
+            generateWidget.setWindowIcon(QIcon(join(self.addon_path, 'icons', 'mia.png')))
             layout = QHBoxLayout()
             cbLabel = QLabel()
             cbLabel.setText('Origin:')
@@ -66,7 +67,7 @@ class MassExporter:
             generateWidget.setLayout(layout)
             generateWidget.exec_()
         else:
-            showInfo('Please select some cards before attempting to mass generate.', title="MIA Japanese Support Error")
+            miInfo('Please select some cards before attempting to mass generate.', level='err')
 
 
 
@@ -92,7 +93,7 @@ class MassExporter:
           return text
 
     def massRemoveHTML(self, field,  notes, generateWidget):
-        if not askUser('Are you sure you want to mass remove HTML from the "'+ field +'" field? This will not remove images, or "<br>" defined line breaks, but will remove pitch shapes from the previous beta version of the MIA Japanese Support Addon.'):
+        if not miAsk('Are you sure you want to mass remove HTML from the "'+ field +'" field? This will not remove images, or "<br>" defined line breaks, but will remove pitch shapes from the previous beta version of the MIA Japanese Addon.'):
             return
         self.mw.checkpoint('Mass HTML Removal')    
         generateWidget.close() 
@@ -133,7 +134,7 @@ class MassExporter:
         return progressWidget, bar;
 
     def massRemove(self, field,  notes, generateWidget):
-        if not askUser('Are you sure you want to mass remove readings from the "'+ field +'" field? .'):
+        if not miAsk('Are you sure you want to mass remove readings from the "'+ field +'" field? .'):
             return
         self.mw.checkpoint('Mass Accent Removal')
         generateWidget.close() 
@@ -156,7 +157,7 @@ class MassExporter:
         self.mw.reset()
 
     def massGenerate(self, furigana, dictform, accents, audio, charts, field,  notes, generateWidget, dest, addType):
-        if not askUser('Are you sure you want to generate from the "' + field + '" field into the "'+ dest +'" field? This action can not be undone.'):
+        if not miAsk('Are you sure you want to generate from the "' + field + '" field into the "'+ dest +'" field? This action can not be undone.'):
             return
         self.mw.checkpoint('Mass Accent Generation')
         generateWidget.close() 

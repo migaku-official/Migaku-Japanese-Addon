@@ -6,17 +6,18 @@ from os.path import join, exists
 from shutil import copyfile
 from aqt.addcards import AddCards
 from aqt.utils import  showInfo
+from . import reading 
 
 class AccentDictionaryParser:
-    def  __init__(self, exporter, UEManager, adjustVerbs, separateWord, separateVerbPhrase, ignoreVerbs, dontCombineDict, skipList, parseWithMecab, verbToNoun, mecabAccents, mecabReading):
+    def  __init__(self, exporter, UEManager, adjustVerbs, separateWord, separateVerbPhrase, ignoreVerbs, dontCombineDict, skipList, parseWithMecab, verbToNoun):
         self.exporter = exporter
         self.adjustVerbs = adjustVerbs
         self.separateWord = separateWord
         self.separateVerbPhrase = separateVerbPhrase
-        self.mecabAccents = mecabAccents 
+        self.mecabAccents = reading.MecabController()
         self.ueMng = UEManager
         self.dictionary = self.exporter.dictionary
-        self.mecabReading = mecabReading
+        self.mecabReading = reading.MecabController()
         self.verbToNoun = verbToNoun
         self.ignoreVerbs = ignoreVerbs
         self.dontCombineDict = dontCombineDict
@@ -45,7 +46,9 @@ class AccentDictionaryParser:
         
     def generateReadings(self, text):
         text = self.dictionary.convertNumbers(self.exporter.removeBrackets(text))        
-        try:      
+        try:     
+            if not self.mecabReading:
+                self.mecabReading = reading.MecabController()
             text = self.mecabReading.reading(text)        
             return text           
         except Exception as e:
@@ -54,6 +57,8 @@ class AccentDictionaryParser:
     
     def getParsed(self, text):
         try:
+            if not self.mecabAccents:
+                self.mecabAccents = reading.MecabController()
             results = self.mecabAccents.accents(text)
             return results
         except Exception as e:
@@ -61,16 +66,19 @@ class AccentDictionaryParser:
                 raise 
      
     def verbCombiner(self, word, results, idx):
-        hinshi = results[idx][1]
-        while True:
-            idx += 1
-            if idx == len(results):
-                break
-            if (hinshi == u'形容詞' and results[idx][0] == u'さ'
-            ) or (results[idx][1] == u"助動詞" or results[idx][1] == u"助詞" or (results[idx][1] == u"動詞" and results[idx][0] in [ u'させ',u'られ',u'られる', u'られ', u'れる', u'れ', u'せ', u'せる', u'させる'])) and u"格助詞" != results[idx][2] and results[idx][0] not in  [u'よ',u'から', u'ので', u'の', u'が', u'だろ']: 
-                word += results[idx][0]
-            else:
-                break
+        if len(results[idx]) > 1:
+            hinshi = results[idx][1]
+            while True:
+                idx += 1
+                if idx == len(results):
+                    break
+                if len(results[idx]) < 3:
+                    return word, idx
+                if (hinshi == u'形容詞' and results[idx][0] == u'さ'
+                ) or (results[idx][1] == u"助動詞" or results[idx][1] == u"助詞" or (results[idx][1] == u"動詞" and results[idx][0] in [ u'させ',u'られ',u'られる', u'られ', u'れる', u'れ', u'せ', u'せる', u'させる'])) and u"格助詞" != results[idx][2] and results[idx][0] not in  [u'よ',u'から', u'ので', u'の', u'が', u'だろ']: 
+                    word += results[idx][0]
+                else:
+                    break
         return word, idx;
 
     def separateVerbPhraseEditor(self, results, idx):
@@ -484,12 +492,12 @@ class AccentDictionaryParser:
 
     
 class AccentExporter:
-    def  __init__(self, mw, aqt, UEManager, dictionary,  addon_path, adjustVerbs, separateWord, separateVerbPhrase, ignoreVerbs, dontCombineDict, skipList, parseWithMecab, verbToNoun, mecabAccents, mecabReading):
+    def  __init__(self, mw, aqt, UEManager, dictionary,  addon_path, adjustVerbs, separateWord, separateVerbPhrase, ignoreVerbs, dontCombineDict, skipList, parseWithMecab, verbToNoun):
         self.mw = mw
         self.aqt = aqt
         self.dictionary = dictionary
         self.addon_path = addon_path
-        self.dictParser = AccentDictionaryParser(self, UEManager, adjustVerbs, separateWord, separateVerbPhrase, ignoreVerbs, dontCombineDict, skipList, parseWithMecab, verbToNoun, mecabAccents, mecabReading)
+        self.dictParser = AccentDictionaryParser(self, UEManager, adjustVerbs, separateWord, separateVerbPhrase, ignoreVerbs, dontCombineDict, skipList, parseWithMecab, verbToNoun)
         self.common_utils_js = self.getCommonJS()
         self.insertHTMLJS = self.getInsertHTMLJS()
         self.fetchIndividualJS = self.getFetchIndividualJS()
@@ -585,6 +593,31 @@ class AccentExporter:
                 self.addVariants(audioGraphList, note)      
                 note.flush() 
                 self.reloadEditor()
+
+    def fetchParsedField(self, text, note):
+            newText = text
+            newHTML = text
+            text = text.replace('</div> <div>', '</div><div>')
+            htmlFinds, text = self.htmlRemove(text)
+            text, sounds = self.removeBrackets(text, True)
+            text = text.replace(',&', '-co-am-')
+            text, invalids = self.replaceInvalidChars(text)
+            text = self.mw.col.media.strip(text).encode("utf-8", "ignore")
+            results = self.dictParser.getParsed(text)        
+            results = self.wordData(results)
+            text, audioGraphList = self.dictParser.dictBasedParsing(results, newText)   
+            if htmlFinds:
+                text = self.replaceHTML(text, htmlFinds)
+            for match in sounds:
+                text = text.replace("-_-AUDIO-_-", match, 1)
+            if text:
+                text = self.returnInvalids(text, invalids)
+                newHTML = text.replace('-co-am-', ',&').strip()
+                
+            if audioGraphList:
+                self.addVariants(audioGraphList, note)
+            return newHTML
+            
 
     def returnEntities(self, text):
         return text.replace('◱', '&ensp;').replace('◲', '&lt;').replace('◳','&gt;').replace('◴', '&amp;')

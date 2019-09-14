@@ -715,17 +715,14 @@ class Ui_Dialog(object):
         self.miaAboutLinksTitle = QtWidgets.QLabel("<b>Links<b>")
         self.miaAboutLinksMIA = QtWidgets.QLabel("MIA:")
         self.miaAboutLinksHL1 = QtWidgets.QHBoxLayout()
-        self.miaSiteIcon = MIALabel()
-        self.miaSiteIcon.setPixmap(self.getIcon('mia.png', 25))
-        self.miaSiteIcon.setFixedSize(30,30)
+
+        self.miaSiteIcon = self.getSVGWidget('MIA.svg')
         self.miaSiteIcon.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.miaFBIcon = MIALabel()
-        self.miaFBIcon.setPixmap(self.getIcon('fb.png'))
-        self.miaFBIcon.setFixedSize(30,30)
+
+        self.miaFBIcon = self.getSVGWidget('Facebook.svg')
         self.miaFBIcon.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.miaPatreonIcon = MIALabel()
-        self.miaPatreonIcon.setPixmap(self.getIcon('patreon.png'))
-        self.miaPatreonIcon.setFixedSize(30,30)
+
+        self.miaPatreonIcon = self.getSVGWidget('Patreon.svg')
         self.miaPatreonIcon.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
 
         self.miaAboutLinksHL1.addWidget(self.miaAboutLinksMIA)
@@ -736,14 +733,13 @@ class Ui_Dialog(object):
         self.miaAboutLinksHL2 = QtWidgets.QHBoxLayout()
         self.miaAboutLinksHL3 = QtWidgets.QHBoxLayout()
 
-        self.matt = QtWidgets.QLabel("Matt Vs. Japan:")
+        self.matt = QtWidgets.QLabel("Matt vs. Japan:")
         self.mattYT = MIALabel()
 
-        self.mattYT = self.getSVGWidget('yt.svg')
+        self.mattYT = self.getSVGWidget('Youtube.svg')
         self.mattYT.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.mattTW = MIALabel()
-        self.mattTW.setPixmap(self.getIcon('tw.png'))
-        self.mattTW.setFixedSize(30,30)
+            
+        self.mattTW = self.getSVGWidget('Twitter.svg')
         self.mattTW.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
 
         self.miaAboutLinksHL2.addWidget(self.matt)
@@ -752,11 +748,10 @@ class Ui_Dialog(object):
         self.miaAboutLinksHL2.addStretch()
 
         self.yoga = QtWidgets.QLabel("Yoga MIA:")
-        self.yogaYT = self.getSVGWidget('yt.svg')
+        self.yogaYT = self.getSVGWidget('Youtube.svg')
         self.yogaYT.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.yogaTW = MIALabel()
-        self.yogaTW.setPixmap(self.getIcon('tw.png'))
-        self.yogaTW.setFixedSize(30,30)
+
+        self.yogaTW = self.getSVGWidget('Twitter.svg')
         self.yogaTW.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
 
         self.miaAboutLinksHL3.addWidget(self.yoga)
@@ -775,12 +770,11 @@ class Ui_Dialog(object):
         self.miaContactVL = QtWidgets.QVBoxLayout()
         self.miaContact.setStyleSheet("QGroupBox { font-weight: bold; } ")
         self.miaContactText = QtWidgets.QLabel("If you would like to report a bug or contribute to the add-on, the best way to do so is by starting a ticket or pull request on GitHub. If you are looking for personal assistance using the add-on, check out the MIA Patreon Discord Server.")
-        self.miaContactText.setWordWrap(True);
-        self.gitHubIcon = MIALabel()
-        self.gitHubIcon.setPixmap(self.getIcon('github.png'))
-        self.gitHubIcon.setFixedSize(30,30)
-        self.gitHubIcon.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.miaContactText.setWordWrap(True)
 
+        self.gitHubIcon = self.getSVGWidget('Github.svg')
+        self.gitHubIcon.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        
         self.miaThanks = QtWidgets.QGroupBox()
         self.miaThanks.setTitle('A Word of Thanks')
         self.miaThanksVL = QtWidgets.QVBoxLayout()
@@ -789,7 +783,6 @@ class Ui_Dialog(object):
         self.miaThanksText.setOpenExternalLinks(True);
         self.miaThanksText.setWordWrap(True);
         self.miaThanksVL.addWidget(self.miaThanksText)
-
 
         self.miaContactVL.addWidget(self.miaContactText)
         self.miaContactVL.addWidget(self.gitHubIcon)

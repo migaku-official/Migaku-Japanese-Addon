@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#Thanks to Damien Elmes, the MIA Japanese Support Plugin borrows lightly from his project.
+#Thanks to Damien Elmes, the MIA Japanese Add-on borrows lightly from his project.
 #https://ankiweb.net/shared/info/3918629684
 #
 #Thanks to Asweigart, I use Pyperclip in this project

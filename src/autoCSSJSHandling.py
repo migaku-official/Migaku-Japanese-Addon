@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 # 
 from os.path import join
-from aqt.utils import askUser
-from .miutils import miInfo
+from .miutils import miInfo, miAsk
 import re
 
 class AutoCSSJSHandler:
@@ -48,7 +47,6 @@ class AutoCSSJSHandler:
         config = self.getConfig()
         if config["AutoCssJsGeneration"].lower() != 'on':
             return
-        converterCheck =  self.injectJapaneseConverterJs()
         variantCheck = self.checkVariantSyntax()
         self.wrapperDict, wrapperCheck = self.getWrapperDict();        
         models = self.mw.col.models.all()
@@ -57,6 +55,7 @@ class AutoCSSJSHandler:
                 model['css'] = self.editJapaneseCss(model['css'])
                 for idx, t in enumerate(model['tmpls']):
                     modelDict = self.wrapperDict[model['name']]
+                    t = self.injectJapaneseConverterToTemplate(t)
                     if self.templateInModelDict(t['name'], modelDict):
                         templateDict = self.templateFilteredDict(modelDict, t['name'])
                         t['qfmt'], t['afmt'] = self.cleanFieldWrappers(t['qfmt'], t['afmt'], model['flds'], templateDict)
@@ -75,6 +74,7 @@ class AutoCSSJSHandler:
             else:
                 model['css'] = self.removeJapaneseCss(model['css'])
                 for t in model['tmpls']:
+                    t = self.removeKanaOldJsFromTemplate(t)
                     t['qfmt'] = self.removeJapaneseJs(self.removeWrappers(t['qfmt']))
                     t['afmt'] = self.removeJapaneseJs(self.removeWrappers(t['afmt']))   
         self.mw.col.models.save()
@@ -93,6 +93,39 @@ class AutoCSSJSHandler:
         replaceWith = '<div display-type="'+ dType +'" class="wrapped-japanese">{{'+ field + '}}</div>'
         text = re.sub(pattern, replaceWith,text)  
         return text
+
+    def injectJapaneseConverterToTemplate(self, t):
+        config = self.getConfig()
+        converter = config['HistoricalConversion'].lower()
+        kConfig = config['KatakanaConversion'].lower()
+        katakana = 'false'
+        if converter == "off" and kConfig == "off":
+            t = self.removeKanaOldJsFromTemplate(t);       
+        if kConfig not in ['on', 'off']:
+            miInfo('"KatakanaConversion" has an invalid value in the config. Ensure that its value is either "on" or "off".', level="err")
+            return t 
+        elif kConfig  == 'on':
+            katakana = 'true'        
+        if converter not in ['both', 'kanji', 'kana', 'off']:
+            miInfo('"HistoricalConversion" has an invalid value in the config. Ensure that its value is one of the following: "both/kanji/kana/off".', level="err")
+            return t 
+        elif converter in ['both', 'kanji', 'kana']:
+            converterJS = self.getHistoricalConverterJs(converter, katakana)
+            t['qfmt'] = self.newLineReduce(self.removeKataverterJs(self.removeConverterJs(t['qfmt'])) + '\n\n' + converterJS)
+            t['afmt'] = self.newLineReduce(self.removeKataverterJs(self.removeConverterJs(t['afmt'])) + '\n\n' + converterJS)
+            return t 
+        if katakana == 'true':
+            kataverterJS = self.getKataverterJS()
+            t['qfmt'] = self.newLineReduce(self.removeKataverterJs(self.removeConverterJs(t['qfmt'])) + '\n\n' + kataverterJS)
+            t['afmt'] = self.newLineReduce(self.removeKataverterJs(self.removeConverterJs(t['afmt'])) + '\n\n' + kataverterJS)
+        return t 
+
+    def removeKanaOldJsFromTemplate(self, t):
+        t['qfmt'] = self.removeConverterJs(t['qfmt'])
+        t['afmt'] = self.removeConverterJs(t['afmt'])  
+        t['afmt'] = self.removeKataverterJs(t['afmt'])
+        t['qfmt'] = self.removeKataverterJs(t['qfmt']) 
+        return t              
 
     def injectJapaneseConverterJs(self):
         config = self.getConfig()
@@ -182,7 +215,7 @@ class AutoCSSJSHandler:
                     syntaxErrors += '\nThe "' + variant + '" configuration "'+ config[variant] +'" is incorrect. Please ensure that second value is either "overwrite", "add", or "no".'    
         if syntaxErrors != '':
             if len(fieldErrors) > 0:
-                if askUser('Please make sure the syntax is as follows "field,field;type(;separator)". The syntax is incorrect for the following entries:' + syntaxErrors + '\n\n Would you like to delete these fields from you configuration?', title="MIA Japanese Support Error"):
+                if miAsk('Please make sure the syntax is as follows "field,field;type(;separator)". The syntax is incorrect for the following entries:' + syntaxErrors + '\n\n Would you like to delete these fields from you configuration?'):
                     self.deletePitchAudioFields(fieldErrors, config)
             else:
                 miInfo('Please make sure the syntax is as follows "field,field;type(;separator)". The syntax is incorrect for the following entries:' + syntaxErrors, level="err")
