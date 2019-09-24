@@ -142,7 +142,7 @@ def checkProfile():
 def setupMenu(browser):
     if not checkProfile():
         return
-    a = QAction("Generate Accents/Furigana", browser)
+    a = QAction("Generate Readings/Accents/Audio", browser)
     a.triggered.connect(lambda: MExporter.onRegenerate(browser))
     browser.form.menuEdit.addSeparator()
     browser.form.menuEdit.addAction(a)

@@ -779,7 +779,7 @@ class AccentExporter:
         if len(graphCon) == 3:
             gSep = graphCon[2]
         for aField in aFields:
-            if aField in gFields and (aField in fields or aField.lower() == 'clipboard'):
+            if self.dictParser.graphMode and aField in gFields and (aField in fields or aField.lower() == 'clipboard'):
                 text = self.writeAudioGraphsText(audioGraphs, note, aField, graphCon[1], gSep, 2)
             else:
                 if aField in fields or aField.lower() == 'clipboard':
