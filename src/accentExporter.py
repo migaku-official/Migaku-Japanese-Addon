@@ -321,6 +321,9 @@ class AccentDictionaryParser:
 
     def checkIgnoreValue(self):  
         val = self.val
+        if val[0].startswith('input-buffer overflow.'):
+            self.idx += 1
+            return self.checkProceed()
         if val[0] == 'EOS' or (val[7] == '*' and (val[2] != '数' and val[0] not in [u'此', u'其'])) or val[1] == u'記号' or val[0] in [u'の',u'で',u'た',u'に']:
             if val[0] != 'EOS':
                 self.fStr += val[0]
@@ -578,7 +581,7 @@ class AccentExporter:
             text = text.replace(',&', '-co-am-')
             text, invalids = self.replaceInvalidChars(text)
             text = self.mw.col.media.strip(text).encode("utf-8", "ignore")
-            results = self.dictParser.getParsed(text)        
+            results = self.dictParser.getParsed(text)
             results = self.wordData(results)
             text, audioGraphList = self.dictParser.dictBasedParsing(results, newText)   
             if htmlFinds:
@@ -684,9 +687,14 @@ class AccentExporter:
     def wordData(self, results):
         wordResults = []
         for idx, val in enumerate(results):
+            comma = False
+            if val.startswith(',\t'):
+                comma = True
             allCommas = val.replace("\t", ',')
             allCommas = allCommas.replace("\r", '')
             wordResults.append(allCommas.split(","))
+            if comma:
+                wordResults[len(wordResults) - 1][0] = ','
         del wordResults[-1]
         del wordResults[-1]
         return wordResults

@@ -89,7 +89,7 @@ class MecabController(object):
         self.mecab.stdin.write(text + b"\n")
         self.mecab.stdin.flush()
         results, err = self.mecab.communicate()
-        results = results.decode('utf-8').split("\n")
+        results = results.decode('utf-8', "ignore").split("\n")
         self.mecab = None
 
         return results
@@ -100,7 +100,7 @@ class MecabController(object):
         matches, expr = escapeText(expr)
         self.mecab.stdin.write(expr.encode('utf-8', "ignore") + b'\n')
         self.mecab.stdin.flush()
-        expr = self.mecab.stdout.readline().rstrip(b'\r\n').decode('utf-8')
+        expr = self.mecab.stdout.readline().rstrip(b'\r\n').decode('utf-8', "ignore")
         out = []
         for node in expr.split(" "):
             if not node:
