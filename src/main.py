@@ -333,7 +333,7 @@ def clickPlayAudio(cmd):
     splitList = cmd.split(';')
     path = fetchAudioFromDict(splitList[1],  splitList[2], int(splitList[3]))
     if path:
-        path = join(addon_path, 'accentAudio', path)
+        path = join(addon_path, "user_files", 'accentAudio', path)
         if exists(path):
             sound.play(path)
 

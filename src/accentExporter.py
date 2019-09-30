@@ -845,7 +845,7 @@ class AccentExporter:
         return text
 
     def moveAudioToMediaDir(self, filename):
-        src = join(self.addon_path, "accentAudio", filename)
+        src = join(self.addon_path,"user_files", "accentAudio", filename)
         if exists(src): 
             path = join(self.mw.col.media.dir(), filename)
             if not exists(path): 
