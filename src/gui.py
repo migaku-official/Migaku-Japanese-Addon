@@ -815,7 +815,7 @@ class JSGui(QScrollArea):
 
     def dupeRow(self, afList, profile, nt, ct, field, side, dt, selRow = False):
         for i in range(afList.rowCount()):
-            if selRow:
+            if selRow is not False:
                 if i == selRow[0].row():
                     continue
             if (afList.item(i, 0).text() == profile or afList.item(i, 0).text() == 'All' or profile == "All") and afList.item(i, 1).text() == nt and afList.item(i, 2).text() == ct and afList.item(i, 3).text() == field and (afList.item(i, 4).text() == side or afList.item(i, 4).text() == 'Both' or side == "Both"):
