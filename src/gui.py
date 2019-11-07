@@ -1122,7 +1122,7 @@ class JSGui(QScrollArea):
         if button.text() == 'Remove':
             if value in vList:
                 vList.remove(value)
-                lWidget.setText(', '.join(vList))
+                lWidget.setText('<i>'+', '.join(vList)+ '</i>')
                 button.setText('Add')
                 if len(vList) == 0 or (len(vList) == 1 and vList[0].lower() == 'none'):
                     lWidget.setText('<i>None currently selected.</i>')
