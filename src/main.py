@@ -187,22 +187,29 @@ def openGui():
 def setupGuiMenu():
     addMenu = False
     if not hasattr(mw, 'MIAMenu'):
-        mw.MIAMenu = QMenu('MIA | Settings',  mw)
+        mw.MIAMenu = QMenu('MIA',  mw)
         addMenu = True
-    setting = QAction("Japanese Settings", mw.MIAMenu)
+    if not hasattr(mw, 'MIAMenuSettings'):
+        mw.MIAMenuSettings = []
+    if not hasattr(mw, 'MIAMenuActions'):
+        mw.MIAMenuActions = []
+
+    setting = QAction("Japanese Settings", mw)
     setting.triggered.connect(openGui)
-    mw.MIAMenu.addAction(setting)
-    if addMenu:
-        mw.form.menuTools.addMenu(mw.MIAMenu)
-    addActions = False
-    if not hasattr(mw, 'MIAActions'):
-        mw.MIAActions = QMenu('MIA | Actions',  mw)
-        addActions = True
-    action = QAction("Add Parsing Overwrite Rule", mw.MIAActions)
+    mw.MIAMenuSettings.append(setting)
+    action = QAction("Add Parsing Overwrite Rule", mw)
     action.triggered.connect(UEManager.openAddMenu)
-    mw.MIAActions.addAction(action)
-    if addActions:
-        mw.form.menuTools.addMenu(mw.MIAActions)
+    mw.MIAMenuActions.append(action)
+
+    mw.MIAMenu.clear()
+    for act in mw.MIAMenuSettings:
+        mw.MIAMenu.addAction(act)
+    mw.MIAMenu.addSeparator()
+    for act in mw.MIAMenuActions:
+        mw.MIAMenu.addAction(act)
+
+    if addMenu:
+        mw.form.menubar.insertMenu(mw.form.menuHelp.menuAction(), mw.MIAMenu)
 
 setupGuiMenu()
 AnkiQt.loadProfile = wrap(AnkiQt.loadProfile, loadCollectionArray, 'before')
