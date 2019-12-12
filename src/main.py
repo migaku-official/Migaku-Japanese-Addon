@@ -186,8 +186,8 @@ def openGui():
      
 def setupGuiMenu():
     addMenu = False
-    if not hasattr(mw, 'MIAMenu'):
-        mw.MIAMenu = QMenu('MIA',  mw)
+    if not hasattr(mw, 'MIAMainMenu'):
+        mw.MIAMainMenu = QMenu('MIA',  mw)
         addMenu = True
     if not hasattr(mw, 'MIAMenuSettings'):
         mw.MIAMenuSettings = []
@@ -201,15 +201,15 @@ def setupGuiMenu():
     action.triggered.connect(UEManager.openAddMenu)
     mw.MIAMenuActions.append(action)
 
-    mw.MIAMenu.clear()
+    mw.MIAMainMenu.clear()
     for act in mw.MIAMenuSettings:
-        mw.MIAMenu.addAction(act)
-    mw.MIAMenu.addSeparator()
+        mw.MIAMainMenu.addAction(act)
+    mw.MIAMainMenu.addSeparator()
     for act in mw.MIAMenuActions:
-        mw.MIAMenu.addAction(act)
+        mw.MIAMainMenu.addAction(act)
 
     if addMenu:
-        mw.form.menubar.insertMenu(mw.form.menuHelp.menuAction(), mw.MIAMenu)
+        mw.form.menubar.insertMenu(mw.form.menuHelp.menuAction(), mw.MIAMainMenu)
 
 setupGuiMenu()
 AnkiQt.loadProfile = wrap(AnkiQt.loadProfile, loadCollectionArray, 'before')
