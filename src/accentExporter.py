@@ -2,11 +2,13 @@
 # 
 import re
 from . import Pyperclip 
+import json
 from os.path import join, exists
 from shutil import copyfile
 from aqt.addcards import AddCards
 from aqt.utils import  showInfo
 from . import reading 
+from .constants import *
 
 class AccentDictionaryParser:
     def  __init__(self, exporter, UEManager, adjustVerbs, separateWord, separateVerbPhrase, ignoreVerbs, dontCombineDict, skipList, parseWithMecab, verbToNoun):
@@ -75,7 +77,7 @@ class AccentDictionaryParser:
                 if len(results[idx]) < 3:
                     return word, idx
                 if (hinshi == u'形容詞' and results[idx][0] == u'さ'
-                ) or (results[idx][1] == u"助動詞" or results[idx][1] == u"助詞" or (results[idx][1] == u"動詞" and results[idx][0] in [ u'させ',u'られ',u'られる', u'られ', u'れる', u'れ', u'せ', u'せる', u'させる'])) and u"格助詞" != results[idx][2] and results[idx][0] not in  [u'よ',u'から', u'ので', u'の', u'が', u'だろ']: 
+                ) or (results[idx][1] == u"助動詞" or results[idx][1] == u"助詞" or (results[idx][1] == u"動詞" and results[idx][0] in [ u'させ',u'られ',u'られる', u'られ', u'れる', u'れ', u'せ', u'せる', u'させる'])) and u"格助詞" != results[idx][2] and results[idx][0] not in  [u'か',u'よ',u'から', u'ので', u'の', u'が', u'だろ']: 
                     word += results[idx][0]
                 else:
                     break
@@ -87,12 +89,12 @@ class AccentDictionaryParser:
         for altCount,alternate in enumerate(data):
             verbPhrase = verbPhrase[len(alternate):]
             if altCount == 0:
-                results[idx] = self.exporter.wordData(self.getParsed(alternate.encode("utf-8", "ignore")))[0]
+                results[idx] = self.exporter.wordData(self.getParsed(alternate))[0]
             else:
-                results.insert( idx + altCount, self.exporter.wordData(self.getParsed(alternate.encode("utf-8", "ignore")))[0])
+                results.insert( idx + altCount, self.exporter.wordData(self.getParsed(alternate))[0])
         startIdx = idx + altCount 
         verbPhrase, endIdx  = self.verbCombiner(verbPhrase, results, startIdx)
-        verbList = self.exporter.wordData(self.getParsed(verbPhrase.encode("utf-8", "ignore")))
+        verbList = self.exporter.wordData(self.getParsed(verbPhrase))
         for vCount in reversed(range(startIdx+ 1 , endIdx)):
             del results[vCount]
         for v in reversed(verbList):
@@ -103,9 +105,9 @@ class AccentDictionaryParser:
         data = self.separateWord[results[idx][0]]
         for altCount,alternate in enumerate(data):
             if altCount == 0:
-                results[idx] = self.exporter.wordData(self.getParsed(alternate.encode("utf-8", "ignore")))[0]
+                results[idx] = self.exporter.wordData(self.getParsed(alternate))[0]
             else:
-                results.insert( idx + altCount, self.exporter.wordData(self.getParsed(alternate.encode("utf-8", "ignore")))[0])
+                results.insert( idx + altCount, self.exporter.wordData(self.getParsed(alternate))[0])
         return results
 
     def checkJyodoushi(self, word, type):
@@ -313,18 +315,17 @@ class AccentDictionaryParser:
             self.kanaMode, self.dictMode, self.pitchMode, self.audioMode, self.graphMode = configList
         else:
             self.kanaMode, self.dictMode, self.pitchMode, self.audioMode, self.graphMode = self.getKanaDictPitch(individual)
-        if not self.kanaMode and not self.dictMode and not self.pitchMode and not self.audioMode and not self.graphMode or len(results) < 1:
+        if (not self.kanaMode and not self.dictMode and not self.pitchMode and not self.audioMode and not self.graphMode ) or len(results) < 1:
             return text, False
-        
         return self.processText(text)
 
 
-    def checkIgnoreValue(self):  
+    def checkIgnoreValue(self):
         val = self.val
         if val[0].startswith('input-buffer overflow.'):
             self.idx += 1
             return self.checkProceed()
-        if val[0] == 'EOS' or (val[7] == '*' and (val[2] != '数' and val[0] not in [u'此', u'其'])) or val[1] == u'記号' or val[0] in [u'の',u'で',u'た',u'に']:
+        if val[0] in 'EOS' or (val[7] == '*' and (val[2] != '数' and val[0] not in [u'此', u'其'])) or val[1] == u'記号' or val[0] in [u'の',u'で',u'た',u'に']:
             if val[0] != 'EOS':
                 self.fStr += val[0]
             self.idx += 1
@@ -471,6 +472,7 @@ class AccentDictionaryParser:
             self.val = self.results[self.idx]
             self.prevW, self.nextW = self.getPrevWNextW()
             proceed = self.checkIgnoreValue()
+
             if proceed == 1:
                 break
             elif proceed == 2:
@@ -490,10 +492,8 @@ class AccentDictionaryParser:
         if not self.kanaMode and not self.dictMode and not self.pitchMode:
             return text, self.audioGraphList;
         else: 
-            return self.ueMng.applyRulesToText(self.noBracketsNoSpaces(self.fStr.replace('[]', '').replace(',]', ']').replace('--= HTML=--', '--=HTML=--').replace('--=HTML =--', '--=HTML=--').replace('  ', ' '))), self.audioGraphList;
+            return self.ueMng.applyRulesToText(self.noBracketsNoSpaces(self.fStr.replace('[]', '').replace(',]', ']').replace('  ', ' '))), self.audioGraphList;
 
-
-    
 class AccentExporter:
     def  __init__(self, mw, aqt, UEManager, dictionary,  addon_path, adjustVerbs, separateWord, separateVerbPhrase, ignoreVerbs, dontCombineDict, skipList, parseWithMecab, verbToNoun):
         self.mw = mw
@@ -501,8 +501,9 @@ class AccentExporter:
         self.dictionary = dictionary
         self.addon_path = addon_path
         self.dictParser = AccentDictionaryParser(self, UEManager, adjustVerbs, separateWord, separateVerbPhrase, ignoreVerbs, dontCombineDict, skipList, parseWithMecab, verbToNoun)
-        self.common_utils_js = self.getCommonJS()
+        self.commonJS = self.getCommonJS()
         self.insertHTMLJS = self.getInsertHTMLJS()
+        self.insertToFieldJS = self.getInsertToFieldJS()
         self.fetchIndividualJS = self.getFetchIndividualJS()
         self.fetchTextJS = self.getFetchTextJS()
         self.bracketsFromSelJS = self.getBracketFromSelJs()
@@ -512,6 +513,11 @@ class AccentExporter:
         common_utils_path = join(self.addon_path, "js", "common.js")
         with open(common_utils_path, "r") as common_utils_file:
             return common_utils_file.read()
+
+    def getInsertToFieldJS(self):
+        insertHTML = join(self.addon_path, "js", "insertHTMLToField.js")
+        with open(insertHTML, "r", encoding="utf-8") as insertHTMLFile:
+            return insertHTMLFile.read() 
 
     def getInsertHTMLJS(self):
         insertHTML = join(self.addon_path, "js", "insertHTML.js")
@@ -539,10 +545,10 @@ class AccentExporter:
             return removeBracketsFile.read()
 
     def individualExport(self, editor):
-        editor.web.eval(self.common_utils_js + self.fetchIndividualJS)
+        editor.web.eval(self.commonJS + self.fetchIndividualJS)
 
     def groupExport(self, editor):
-        editor.web.eval(self.common_utils_js + self.fetchTextJS)
+        editor.web.eval(self.commonJS + self.fetchTextJS)
 
     def editorText(self, editor):    
         text = editor.web.selectedText()
@@ -552,11 +558,10 @@ class AccentExporter:
             return text
 
     def cleanField(self, editor):
-        self.mw.checkpoint('Accent Removal')
         if self.editorText(editor):
-            editor.web.eval(self.common_utils_js + self.bracketsFromSelJS)
+            editor.web.eval(self.commonJS + self.bracketsFromSelJS)
         else:
-            editor.web.eval(self.common_utils_js + self.removeBracketsJS)
+            editor.web.eval(self.commonJS + self.removeBracketsJS)
 
     def reloadEditor(self):
         browser = self.aqt.DialogManager._dialogs["Browser"][1]
@@ -570,32 +575,33 @@ class AccentExporter:
             self.mw.progress.timer(100, editCurrent.editor.loadNoteKeepingFocus, False)
 
 
+    def convertMalformedSpaces(self, text):
+        return re.sub(r'& ?nbsp ?;', ' ', text)
+
     def finalizeGroupExport(self, editor, text, field, note):
         if note and field:
-            if type(editor.parentWindow) is not AddCards:
-                self.mw.checkpoint('Sentence Accent Generation')
+            # if type(editor.parentWindow) is not AddCards:
+                # self.mw.checkpoint('Sentence Accent Generation')
             newText = text
-            text = text.replace('</div> <div>', '</div><div>')
             htmlFinds, text = self.htmlRemove(text)
             text, sounds = self.removeBrackets(text, True)
-            text = text.replace(',&', '-co-am-')
             text, invalids = self.replaceInvalidChars(text)
-            text = self.mw.col.media.strip(text).encode("utf-8", "ignore")
+            text = self.mw.col.media.strip(text)
             results = self.dictParser.getParsed(text)
             results = self.wordData(results)
             text, audioGraphList = self.dictParser.dictBasedParsing(results, newText)   
             if htmlFinds:
                 text = self.replaceHTML(text, htmlFinds)
             for match in sounds:
-                text = text.replace("-_-AUDIO-_-", match, 1)
+                text = text.replace(AUDIO_REPLACER, match, 1)
             if text:
                 text = self.returnInvalids(text, invalids)
-                newHTML = text.replace('-co-am-', ',&').strip()
-                editor.web.eval(self.common_utils_js + self.insertHTMLJS % newHTML.replace('"', '\\"'))
+                newHTML = self.convertMalformedSpaces(text).strip()
+                editor.web.eval(self.commonJS + self.insertHTMLJS % newHTML.replace('"', '\\"'))
             if audioGraphList:
-                self.addVariants(audioGraphList, note)      
-                note.flush() 
-                self.reloadEditor()
+                self.addVariants(audioGraphList, note, editor)      
+                # note.flush() 
+                # self.reloadEditor()
 
     def fetchParsedField(self, text, note):
             newText = text
@@ -605,14 +611,14 @@ class AccentExporter:
             text, sounds = self.removeBrackets(text, True)
             text = text.replace(',&', '-co-am-')
             text, invalids = self.replaceInvalidChars(text)
-            text = self.mw.col.media.strip(text).encode("utf-8", "ignore")
+            text = self.mw.col.media.strip(text)
             results = self.dictParser.getParsed(text)        
             results = self.wordData(results)
             text, audioGraphList = self.dictParser.dictBasedParsing(results, newText)   
             if htmlFinds:
                 text = self.replaceHTML(text, htmlFinds)
             for match in sounds:
-                text = text.replace("-_-AUDIO-_-", match, 1)
+                text = text.replace(AUDIO_REPLACER, match, 1)
             if text:
                 text = self.returnInvalids(text, invalids)
                 newHTML = text.replace('-co-am-', ',&').strip()
@@ -638,8 +644,8 @@ class AccentExporter:
     def finalizeIndividualExport(self, editor, text, field, note):
         if not note or not field or text == '':
             return
-        if type(editor.parentWindow) is not AddCards:
-            self.mw.checkpoint('Word Accent Generation')
+        # if type(editor.parentWindow) is not AddCards:
+            # self.mw.checkpoint('Word Accent Generation')
         text = self.cleanEntities(text)
         rawString = re.search(r'--IND--.+--IND--', text)
         if not rawString:
@@ -656,7 +662,7 @@ class AccentExporter:
         ogString = subString
         subString = re.sub(r'\[[^\]]+\]', '', subString)
         newText = subString
-        newText = self.mw.col.media.strip(newText).encode("utf-8", "ignore")
+        newText = self.mw.col.media.strip(newText)
         results = self.dictParser.getParsed(newText)
         results = self.wordData(results)
         parsed, audioGraphList = self.dictParser.dictBasedParsing(results, subString, True, False, yomi)
@@ -677,26 +683,21 @@ class AccentExporter:
                         newHTML = self.returnEntities(text.replace(rawString, rawString.replace(parsed, ' ' + parsed + ' '))).replace('--IND--', '')
                     else:
                         newHTML = self.returnEntities(text.replace(rawString, rawString.replace(re.sub(r'\[.*\]', '', parsed), ' ' + parsed + ' '))).replace('--IND--', '')
-                    editor.web.eval(self.common_utils_js + self.insertHTMLJS % newHTML.replace('"', '\\"'))
+                    editor.web.eval(self.commonJS + self.insertHTMLJS % self.convertMalformedSpaces(newHTML).replace('"', '\\"'))
         if audioGraphList:
-            self.addVariants(audioGraphList, note)      
-            note.flush() 
-            self.reloadEditor()
+            self.addVariants(audioGraphList, note, editor)      
+            # note.flush() 
+            # self.reloadEditor()
 
 
     def wordData(self, results):
         wordResults = []
         for idx, val in enumerate(results):
-            comma = False
-            if val.startswith(',\t'):
-                comma = True
-            allCommas = val.replace("\t", ',')
-            allCommas = allCommas.replace("\r", '')
-            wordResults.append(allCommas.split(","))
-            if comma:
-                wordResults[len(wordResults) - 1][0] = ','
-        del wordResults[-1]
-        del wordResults[-1]
+            word, rest = val.split('\t', 1)
+            wordList = []
+            wordList.append(word)
+            wordList+= rest.split(',')
+            wordResults.append(wordList)
         return wordResults
 
     def replaceInvalidChars(self, text):
@@ -721,17 +722,17 @@ class AccentExporter:
     def htmlRemove(self, text):
         pattern = r"(?:<[^<]+?>)"
         finds = re.findall(pattern, text)
-        text = re.sub(r"<[^<]+?>", "--=HTML=--", text)
+        text = re.sub(r"<[^<]+?>", HTML_REPLACER, text)
         return finds,text;
 
     def replaceHTML(self, text, matches):
         if matches:
             for match in matches:
-                text = text.replace("--=HTML=--", match, 1)
+                text = text.replace(HTML_REPLACER, match, 1)
         return text
 
     def cleanSpaces(self, text):
-        pattern  = r'[À-ÿA-Za-z:,.;()0-9]+\s[À-ÿA-Za-z,.:;()0-9]+\s*'
+        pattern  = r'[À-ÿA-Za-z:,.;()。0-9]+\s[À-ÿA-Za-z,.:;()。0-9]+\s*'
         finds = re.findall(pattern, text)
         if finds:
             for find in finds:
@@ -750,7 +751,7 @@ class AccentExporter:
             if returnSounds:
                 pattern = r"(?:\[sound:[^\]]+?\])|(?:\[\d*\])"
                 finds = re.findall(pattern, text)
-                text = re.sub(r"(?:\[sound:[^\]]+?\])|(?:\[\d*\])", "-_-AUDIO-_-", text)
+                text = re.sub(r"(?:\[sound:[^\]]+?\])|(?:\[\d*\])", AUDIO_REPLACER, text)
                 return text, finds;
             return text
         if removeAudio:
@@ -760,20 +761,20 @@ class AccentExporter:
         else:
             pattern = r"(?:\[sound:[^\]]+?\])|(?:\[\d*\])"
             finds = re.findall(pattern, text)
-            text = re.sub(r"(?:\[sound:[^\]]+?\])|(?:\[\d*\])", "-_-AUDIO-_-", text)
+            text = re.sub(r"(?:\[sound:[^\]]+?\])|(?:\[\d*\])", AUDIO_REPLACER, text)
             text  = re.sub(r'\[[^]]*?\]', '', text)
             text = self.cleanSpaces(text)
             text = self.replaceHTML(text, matches)
             if returnSounds:
                 return text, finds;
             for match in finds:
-                text = text.replace("-_-AUDIO-_-", match, 1)
+                text = text.replace(AUDIO_REPLACER, match, 1)
             return text
 
     def getConfig(self):
         return self.mw.addonManager.getConfig(__name__)
 
-    def addVariants(self, audioGraphs, note): 
+    def addVariants(self, audioGraphs, note, editor = False): 
         config = self.getConfig()
         audioCon = config['AudioFields'].split(';')
         graphCon = config['PitchGraphFields'].split(';')
@@ -788,16 +789,29 @@ class AccentExporter:
             gSep = graphCon[2]
         for aField in aFields:
             if self.dictParser.graphMode and aField in gFields and (aField in fields or aField.lower() == 'clipboard'):
-                text = self.writeAudioGraphsText(audioGraphs, note, aField, graphCon[1], gSep, 2)
+                text = self.writeAudioGraphsText(audioGraphs, note, aField, graphCon[1], gSep, 2, editor)
             else:
                 if aField in fields or aField.lower() == 'clipboard':
-                    text = self.writeAudioGraphsText(audioGraphs, note, aField, audioCon[1], aSep, 0)
+                    text = self.writeAudioGraphsText(audioGraphs, note, aField, audioCon[1], aSep, 0, editor)
         for gField in gFields:
             if (gField in fields or gField.lower() == 'clipboard') and gField not in aFields:
-                text = self.writeAudioGraphsText(audioGraphs, note, gField, graphCon[1], gSep, 1)
+                text = self.writeAudioGraphsText(audioGraphs, note, gField, graphCon[1], gSep, 1, editor)
 
-    def writeAudioGraphsText(self, audioGraphs, note, field, overAdd, sep, which):
+    def getFieldOrdinal(self, note, field):
+        fields = note._model["flds"]
+        for f in fields:
+            if field == f['name']:
+                return f['ord']
+        else:
+            return False
+        
+
+
+    def writeAudioGraphsText(self, audioGraphs, note, field, overAdd, sep, which, editor):
         text = ''
+        ordinal = False
+        if editor:
+            ordinal = self.getFieldOrdinal(note, field)
         if not audioGraphs or len(audioGraphs) == 0:
             return
         for idx, val in enumerate(audioGraphs):
@@ -823,15 +837,23 @@ class AccentExporter:
         if field.lower() == 'clipboard':
             Pyperclip.copy(sep.replace('<br>', '', 1) + text)
         elif overAdd == 'overwrite':
-            note[field] = sep.replace('<br>', '', 1) + text
+            self.addToNote(editor, note, field, ordinal, sep.replace('<br>', '', 1) + text)
         elif overAdd == 'add':
-            if note[field] == '':
-                note[field] += sep.replace('<br>', '', 1) + text
+            if note[field] == '' or editor:
+                self.addToNote(editor, note, field, ordinal, note[field] + sep.replace('<br>', '', 1) + text)
             else:
-                note[field] += sep + text
+                self.addToNote(editor, note, field, ordinal, note[field] + sep.replace('<br>', '', 1) + text)
         elif overAdd == 'no':
             if note[field] == '':
-                note[field] = sep.replace('<br>', '', 1) + text   
+                self.addToNote(editor, note, field, ordinal, sep.replace('<br>', '', 1) + text)
+
+    def addToNote(self, editor, note, field, ordinal, text):
+        if ordinal is not False and editor is not False:
+            editor.web.eval(self.commonJS + self.insertToFieldJS % (text.replace('"', '\\"'), str(ordinal)))
+        else:
+            note[field] = text
+
+
 
     def addToText(self, text, idx, val, sep = False, audio = False):
         if val not in text:
@@ -853,3 +875,6 @@ class AccentExporter:
             return True
         else:
             return False
+
+
+

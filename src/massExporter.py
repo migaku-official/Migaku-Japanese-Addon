@@ -4,6 +4,9 @@ from aqt.qt import *
 import re
 from .miutils import miInfo,  miAsk
 from os.path import join
+from .constants import *
+
+
 
 class MassExporter:
     def  __init__(self, mw, exporter, addon_path):
@@ -74,13 +77,13 @@ class MassExporter:
     def imgRemove(self, text):
         pattern = r"(?:<img[^<]+?>)"
         finds = re.findall(pattern, text)
-        text = re.sub(r"<img[^<]+?>", "--=HTML=--", text)
+        text = re.sub(r"<img[^<]+?>", HTML_REPLACER, text)
         return finds,text;
 
     def replaceImg(self, text, matches):
         if matches:
             for match in matches:
-                text = text.replace("--=HTML=--", match, 1)
+                text = text.replace(HTML_REPLACER, match, 1)
         return text
 
     def removeHTML(self, text):
@@ -157,7 +160,7 @@ class MassExporter:
         self.mw.reset()
 
     def massGenerate(self, furigana, dictform, accents, audio, charts, field,  notes, generateWidget, dest, addType):
-        if not miAsk('Are you sure you want to generate from the "' + field + '" field into the "'+ dest +'" field? This action can not be undone.'):
+        if not miAsk('Are you sure you want to generate from the "' + field + '" field into the "'+ dest +'" field?'):
             return
         self.mw.checkpoint('Mass Accent Generation')
         generateWidget.close() 
@@ -176,14 +179,14 @@ class MassExporter:
                 text, sounds = self.exporter.removeBrackets(text, True)
                 text = text.replace(',&', '-co-am-')
                 text, invalids = self.exporter.replaceInvalidChars(text);
-                text = self.mw.col.media.strip(text).encode("utf-8", "ignore")
+                text = self.mw.col.media.strip(text)
                 results = self.dictParser.getParsed(text)
                 results = self.exporter.wordData(results)
                 text, audioGraphList = self.dictParser.dictBasedParsing(results, newText, False, [furigana.isChecked(), dictform.isChecked(), accents.isChecked(), audio.isChecked(), charts.isChecked()])
                 if htmlFinds:
                     text = self.exporter.replaceHTML(text, htmlFinds)
                 for match in sounds:
-                    text = text.replace("-_-AUDIO-_-", match, 1)
+                    text = text.replace(AUDIO_REPLACER, match, 1)
                 if text:
                     text = self.exporter.returnInvalids(text, invalids)
                     text = text.replace('-co-am-', ',&').strip()
@@ -196,7 +199,7 @@ class MassExporter:
                         else:
                             note[dest] += '<br>' + text
                     else:
-                        note[dest] = text    
+                        note[dest] = self.exporter.convertMalformedSpaces(text)
                 if audioGraphList:
                     self.exporter.addVariants(audioGraphList, note)
                 if text or audioGraphList:       

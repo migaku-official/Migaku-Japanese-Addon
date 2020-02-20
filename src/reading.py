@@ -3,10 +3,13 @@
 import sys, os, platform, re, subprocess, aqt.utils
 from anki.utils import stripHTML, isWin, isMac
 from anki.hooks import addHook
-
+from . import Pyperclip
 from aqt import mw
 from aqt.qt import *
 from aqt.utils import showInfo
+from .constants import *
+
+BUFFER_SIZE = '819200'
 config = mw.addonManager.getConfig(__name__)
 
 kakasiArgs = ["-isjis", "-osjis", "-u", "-JH", "-KH"]
@@ -18,16 +21,16 @@ supportDir = os.path.join(os.path.dirname(__file__), "support")
 def htmlReplace(text):
     pattern = r"(?:<[^<]+?>)"
     finds = re.findall(pattern, text)
-    text = re.sub(r"<[^<]+?>", "--=HTML=--", text)
+    text = re.sub(r"<[^<]+?>", HTML_REPLACER, text)
     return finds,text;
 
 def escapeText(text):
     text = text.replace("\n", " ")
     text = text.replace(u'\uff5e', "~")
-    text = re.sub("<br( /)?>", "---newline---", text)
+    text = re.sub("<br( /)?>", NEWLINE_REPLACER, text)
     matches, text = htmlReplace(text)
 
-    text = text.replace("---newline---", "<br>")
+    text = text.replace(NEWLINE_REPLACER, "<br>")
     return matches, text;
 
 if sys.platform == "win32":
@@ -58,11 +61,11 @@ class MecabController(object):
     def setup(self):
         self.mecabCmd = mungeForPlatform(
             [os.path.join(supportDir, "mecab")] + mecabArgs + [
-                '-d', supportDir, '-r', os.path.join(supportDir,"mecabrc")])
+                '-d', supportDir, '-r', os.path.join(supportDir,"mecabrc"), '-b', BUFFER_SIZE ])
         self.mecabCmdAlt = mungeForPlatform([
             os.path.join(supportDir, "mecab"),
             "-r", os.path.join(supportDir, "mecabrc"),
-            "-d", supportDir
+            "-d", supportDir, '-b', BUFFER_SIZE
             ])
         os.environ['DYLD_LIBRARY_PATH'] = supportDir
         os.environ['LD_LIBRARY_PATH'] = supportDir
@@ -84,15 +87,29 @@ class MecabController(object):
             except OSError:
                 raise Exception("Please ensure your Linux system has 64 bit binary support.")
 
+    # def accents(self, text):
+    #     self.ensureOpen(True)
+    #     self.mecab.stdin.write(text + b"\n")
+    #     self.mecab.stdin.flush()
+    #     results, err = self.mecab.communicate()
+    #     results = results.decode('utf-8', "ignore").split("\n")
+    #     self.mecab = None
+
+    #     return results
+
     def accents(self, text):
+        text = text.replace('\n','').encode("utf-8", "ignore")
         self.ensureOpen(True)
         self.mecab.stdin.write(text + b"\n")
         self.mecab.stdin.flush()
-        results, err = self.mecab.communicate()
-        results = results.decode('utf-8', "ignore").split("\n")
-        self.mecab = None
-
-        return results
+        final = []
+        while True:
+            results = self.mecab.stdout.readline()
+            results = results.decode('utf-8', "ignore")
+            if results == 'EOS\r\n' or results == 'EOS\n':
+                break
+            final.append(results.replace('\r', '').replace('\n', ''))
+        return final
 
     def reading(self, expr):
 
@@ -150,9 +167,9 @@ class MecabController(object):
             #     s += " "
             fin += s
         for match in matches:
-            fin = fin.replace("--= HTML=--", match, 1)
+            fin = fin.replace(HTML_REPLACER, match, 1)
 
-        return fin.strip().replace("< br>", "<br>").replace('& nbsp;', ' ')
+        return re.sub(r'& ?nbsp ?;', ' ', re.sub(r"< ?br ?>", "<br>", fin.strip()))
 
 class KakasiController(object):
 

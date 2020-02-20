@@ -456,6 +456,8 @@ class JSGui(QScrollArea):
             self.ui.displayShapes.setChecked(True)
         if self.config['GraphOnHover'].lower() == 'on':
             self.ui.graphOnHover.setChecked(True)
+        if self.config['GraphOnHoverBack'].lower() == 'on':
+            self.ui.graphOnHoverBack.setChecked(True)
         if self.config['BufferedOutput'].lower() == 'on':
             self.ui.bufferedOutput.setChecked(True)
         if self.config['PlayAudioOnClick'].lower() == 'on':
@@ -592,11 +594,11 @@ class JSGui(QScrollArea):
         ffs, la = self.saveNumberConfigOptions()
         ac, gc = self.saveAudioGraphsConfig()
         colors = self.saveHANOK()
-        addmia, bo, autocss, ds, goh, kc, poc = self.saveBinaryOptions()
+        addmia, bo, autocss, ds, goh, gohb, kc, poc = self.saveBinaryOptions()
         newConf = {"ActiveFields" : self.saveActiveFields(), "Individual:Kana;DictForm;Pitch;Audio;Graphs" : wc, "Group:Kana;DictForm;Pitch;Audio;Graphs": sc,
          "FuriganaFontSize" : ffs, "LookAhead" : la, "Profiles" : self.saveProfilesConfig(),
          "AudioFields" : ac, "PitchGraphFields" :  gc, "ColorsHANOK" : colors, "AddMIAJapaneseTemplate": addmia, "BufferedOutput" :  bo,
-         "AutoCssJsGeneration" : autocss, "DisplayShapes" : ds, "GraphOnHover" : goh, "KatakanaConversion" : kc, "PlayAudioOnClick" : poc,
+         "AutoCssJsGeneration" : autocss, "DisplayShapes" : ds, "GraphOnHover" : goh, "GraphOnHoverBack" : gohb, "KatakanaConversion" : kc, "PlayAudioOnClick" : poc,
          "HistoricalConversion" : self.saveHistoricalConversion()
 
          }
@@ -624,6 +626,7 @@ class JSGui(QScrollArea):
         autocss = 'off'
         ds = 'off'
         goh = 'off'
+        gohb = 'off'
         kc = 'off'
         poc = 'off'
         if self.ui.addMIANoteType.isChecked():
@@ -636,11 +639,13 @@ class JSGui(QScrollArea):
             ds = 'on'
         if self.ui.graphOnHover.isChecked():
             goh = 'on'
+        if self.ui.graphOnHoverBack.isChecked():
+            gohb = 'on'
         if self.ui.katakanaConversion.isChecked():
             kc = 'on'
         if self.ui.audioOnClick.isChecked():
             poc = 'on'
-        return addmia, bo, autocss, ds, goh, kc, poc;
+        return addmia, bo, autocss, ds, goh, gohb, kc, poc;
 
     def saveHANOK(self):
         return [self.ui.heibanColor.text(), self.ui.atamadakaColor.text(), self.ui.nakadakaColor.text(), self.ui.odakaColor.text(), self.ui.kifukuColor.text()]
@@ -952,7 +957,8 @@ class JSGui(QScrollArea):
         self.ui.furiganaFontSize.setToolTip('This is the size setting of all displayed furigana.\nThe size is in relation to the percentage of the base word\'s, for\nexample 1 is 10\% of the baseword\' size, 2 is 20\%, and so on.')
         self.ui.bufferedOutput.setToolTip('The addon will load a card\'s text in chunks. This option is for very slow machines or \nuseful if a user has lots of cards with a huge amount of text. This option is\nexperimental and it is recommended that the user keeps text on their cards to a moderate length.')
         self.ui.displayShapes.setToolTip('If checked, pitch shapes signifying a word\'s alternate pitch accents will be displayed after\na word on the "coloredkanji", "coloredreading", and "coloredkanjireading" display type options.')
-        self.ui.graphOnHover.setToolTip('If checked, the addon will display pitch accent graphs when hovering over a word.')
+        self.ui.graphOnHover.setToolTip('If checked, the addon will display pitch accent graphs when hovering over a word on the front of the card.')
+        self.ui.graphOnHoverBack.setToolTip('If checked, the addon will display pitch accent graphs when hovering over a word on the back of the card.\n##YOUR NOTE TYPE MUST NOT INCLUDE {{FrontSide}} ON ITS BACK TEMPLATE FOR THIS TO FUNCTION CORRECTLY.##')
         self.ui.audioOnClick.setToolTip('If checked, audio will be played when clicking a word if it is available.\nNote that the audio will only be played for the first occurrence of the word within the pitch accent dictionary.')
         self.ui.katakanaConversion.setToolTip('If checked, all hiragana will be converted to katakana.')
         self.ui.historicalKanji.setToolTip('If checked, all kanji will be converted to their historical variants.')

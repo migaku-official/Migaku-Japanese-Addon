@@ -67,7 +67,7 @@ class AutoCSSJSHandler:
                             if data[2] == 'both' or data[2] == 'back':          
                                 t['afmt'] = self.overwriteWrapperElement(t['afmt'], data[1], data[3])
                                 t['afmt'] = self.injectWrapperElement(t['afmt'], data[1], data[3])
-                                t['afmt'] = self.editJapaneseJs(t['afmt'])
+                                t['afmt'] = self.editJapaneseJs(t['afmt'], False)
                     else:
                         t['qfmt'] = self.removeJapaneseJs(self.removeWrappers(t['qfmt']))
                         t['afmt'] = self.removeJapaneseJs(self.removeWrappers(t['afmt']))             
@@ -89,7 +89,7 @@ class AutoCSSJSHandler:
 
 
     def injectWrapperElement(self, text, field, dType):
-        pattern = r'(?<!(?:class="wrapped-japanese">))({{'+ field + r'}})'
+        pattern = r'(?<!(?:class="wrapped-japanese">))({{'+ self.cleanFieldName(field) + r'}})'
         replaceWith = '<div display-type="'+ dType +'" class="wrapped-japanese">{{'+ field + '}}</div>'
         text = re.sub(pattern, replaceWith,text)  
         return text
@@ -386,11 +386,15 @@ class AutoCSSJSHandler:
     def templateFilteredDict(self, modelDict, template):
         return list(filter(lambda data, tname = template: data[0] == tname, modelDict))
 
+    def cleanFieldName(self, fieldName):
+        return re.sub(r'([\[\](){}])', r'\\\1',fieldName)
+
     def cleanFieldWrappers(self, front, back, fields, templateDict):
         for field in fields:
             sides = self.fieldInTemplateDict(field['name'], templateDict)   
+            escapedFieldName = self.cleanFieldName(field['name'])
             if len(sides) > 0:
-                pattern = r'<div display-type="[^>]+?" class="wrapped-japanese">({{'+ field['name'] +'}})</div>'
+                pattern = r'<div display-type="[^>]+?" class="wrapped-japanese">({{'+ escapedFieldName +'}})</div>'
                 if 'both' not in sides or 'front' not in sides:
                     front = re.sub(pattern, '{{'+ field['name'] +'}}', front)
                     front = self.removeJapaneseJs(front)
@@ -398,7 +402,7 @@ class AutoCSSJSHandler:
                     back = re.sub(pattern, '{{'+ field['name'] +'}}', back)
                     back = self.removeJapaneseJs(back)
             else:
-                pattern = r'<div display-type="[^>]+?" class="wrapped-japanese">({{'+ field['name'] +'}})</div>'
+                pattern = r'<div display-type="[^>]+?" class="wrapped-japanese">({{'+ escapedFieldName +'}})</div>'
                 front = re.sub(pattern, '{{'+ field['name'] +'}}', front)
                 back = re.sub(pattern, '{{'+ field['name'] +'}}', back)
                 front = self.removeJapaneseJs(front)
@@ -406,14 +410,18 @@ class AutoCSSJSHandler:
         return front, back;
 
 
-    def getJapaneseJs(self):
-        js = '<script>'+ self.jFormattingFunctionsJS +'(function(){const FG_FONT_SIZE=' + self.getFGSize() + ';const BUFFERED_OUTPUT=' + self.getBufferOutSetting() + ';const PITCH_GRAPHS=' + self.getGraphHoverSetting() + ';const PITCH_SHAPES=' + self.getShapeHoverSetting() + ';' + self.formatJapaneseJS + '})()</script>'
+    def getJapaneseJs(self, front):
+        if front:
+            hoverSetting = self.getGraphHoverSetting()
+        else:
+            hoverSetting = self.getGraphHoverBackSetting()
+        js = '<script>'+ self.jFormattingFunctionsJS +'(function(){const FG_FONT_SIZE=' + self.getFGSize() + ';const BUFFERED_OUTPUT=' + self.getBufferOutSetting() + ';var PITCH_GRAPHS=' + hoverSetting + ';const PITCH_SHAPES=' + self.getShapeHoverSetting() + ';' + self.formatJapaneseJS + '})()</script>'
         return self.jJSHeader+ js + self.jJSFooter
 
 
-    def editJapaneseJs(self, text):
+    def editJapaneseJs(self, text, front = True):
         pattern = self.jJSHeader + r'.*?' + self.jJSFooter
-        japaneseJS = self.getJapaneseJs()
+        japaneseJS = self.getJapaneseJs(front)
         if not text:
             return japaneseJS
         match = re.search(pattern, text)
@@ -440,7 +448,7 @@ class AutoCSSJSHandler:
         return re.sub(self.jCssHeaderP + r'\n.*\n' + self.jCssFooterP, '', css)
 
     def overwriteWrapperElement(self, text, field, dType):
-        pattern = r'<div display-type="([^>]+?)" class="wrapped-japanese">{{'+ field + r'}}</div>'
+        pattern = r'<div display-type="([^>]+?)" class="wrapped-japanese">{{'+ self.cleanFieldName(field) + r'}}</div>'
         finds = re.findall(pattern, text)
         if len(finds) > 0:
             for find in finds:
@@ -466,6 +474,12 @@ class AutoCSSJSHandler:
     def getGraphHoverSetting(self):
         config = self.getConfig()
         if config['GraphOnHover'].lower() == 'on':
+            return 'true'
+        return 'false'
+
+    def getGraphHoverBackSetting(self):
+        config = self.getConfig()
+        if config['GraphOnHoverBack'].lower() == 'on':
             return 'true'
         return 'false'
 

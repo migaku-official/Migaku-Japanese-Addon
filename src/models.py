@@ -9,7 +9,7 @@ name = 'MIA Japanese'
 fields = ['Expression',  'Meaning', 'Audio', 'Audio on Front']
 
 front = '''<div class="tags">
-例文{{#Tags}}｜{{/Tags}}{{Tags}}</span>
+例文{{#Tags}}｜{{/Tags}}{{Tags}}
 </div>
 {{^Audio on Front}}<span class="expression-field">{{Expression}}</span>{{/Audio on Front}}
 {{#Audio on Front}}{{#Audio}}<span class="expression-field">{{Audio}}</span>{{/Audio}}{{/Audio on Front}}

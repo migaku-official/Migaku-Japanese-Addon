@@ -55,7 +55,8 @@ function wrapSelection(sel) {
 
 function selBrackDelete() {
   const sel = window.getSelection();
-  var cur = get_field(sel);;
+  var cur = get_field(sel);
+  ogHtml = cur.innerHTML;
   var startCont, startOff, endCont, endOff;
   [startCont, startOff,endCont, endOff] = wrapSelection(sel);
   var offset = 0;
@@ -67,7 +68,8 @@ function selBrackDelete() {
   var removedText = removeBracketsFromSel(selectedText);
   removedText = removedText.replace(/--IND--/g, '');
   const html= cur.innerHTML.replace(selectedText, removedText);
-  cur.innerHTML = '';
+  cur.innerHTML = ogHtml;
+  selectAllFieldNodes(cur, sel);
   setFormat("inserthtml", html);
 
 }

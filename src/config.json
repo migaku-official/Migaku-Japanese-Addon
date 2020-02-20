@@ -6,6 +6,7 @@
     "BufferedOutput" : "off",
     "AutoCssJsGeneration" : "on",
     "DisplayShapes" : "on",
+    "GraphOnHoverBack" : "on",
     "GraphOnHover" : "on",
     "HistoricalConversion" : "off",
     "KatakanaConversion" : "off",

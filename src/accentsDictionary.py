@@ -101,6 +101,8 @@ class AccentsDictionary:
             word = self.convertNumToFullWidth(word)
             if self.singleKana(word):
                 return False, False, False, False;
+            if self.onlyAscii(word):
+                return False, False, False, False;
             readingOnly = self.testReadingOnlyDict(word)
             if readingOnly:
                 return readingOnly, False, False, False; 
@@ -193,6 +195,12 @@ class AccentsDictionary:
         halfWidth = [ord(char) for char in halfWidth]
         translate_table = dict(zip(halfWidth, fullWidth))
         return text.translate(translate_table)
+
+    def onlyAscii(self, word):
+        pattern = r'^[\x00-\x7F]+$'
+        if re.match(pattern, word):
+            return True
+        return False
 
     def singleKana(self, word):
         if len(word)  == 1:

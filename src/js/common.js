@@ -1,3 +1,4 @@
+
 function unnest_span(span) {
   span.normalize();
   var result = [];
@@ -19,6 +20,20 @@ function unnest_span(span) {
   return result;
 }
 
+function selectAllFieldNodes(field, sel){
+  setFormat("inserthtml", '');
+  const newRange = new Range();
+  sel.removeAllRanges();
+  newRange.selectNodeContents(field);
+  sel.addRange(newRange)
+}
+
+function selectText(node, sel) {
+    sel.selectAllChildren(node)
+
+}
+
+
 function clean_field(field) {
   var new_field = document.createDocumentFragment();
   for (var i = 0; i < field.childNodes.length; i++) {
@@ -28,7 +43,6 @@ function clean_field(field) {
       for (var j = 0; j < new_nodes.length; j++) {
         new_field.appendChild(new_nodes[j]);
       }
-      //new_field.append.apply(new_field, unnest_span(node));
     } else {
       new_field.appendChild(node.cloneNode(true));
     }
@@ -47,3 +61,4 @@ function get_field(sel) {
   }
   return node;
 }
+

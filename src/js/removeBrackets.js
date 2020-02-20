@@ -6,11 +6,9 @@ function removeBrackets() {
   const field = get_field(sel);
   let text = field.innerHTML;
   if (text === "") return;
-  let pattern2 = /(\[sound:[^\]]+?\])|(?:\[\d*\])/g;
+  let pattern2 = /(\[sound:[^\]]+?\])|(?:\[\d*\])|(?:\[[\w ]+?\])/g;
   if(!/\[[^\[]*?\]/.test(text))return ;
 
-
-  field.innerHTML = '';
   let pattern = /<[^<]*?>/g;
   let matches = false;
   if (pattern.test(text)){
@@ -18,7 +16,6 @@ function removeBrackets() {
     for (x in matches){
         text = text.replace(matches[x], '---NEWLINE___')
     }   
-    // text.match(/<[^<]?>/, '')
   }
   
   let matches2 = false;
@@ -27,7 +24,6 @@ function removeBrackets() {
     for (x in matches2){
         text = text.replace(matches2[x], '---SOUNDREF___')
     }   
-    // text.match(/<[^<]?>/, '')
   }
 
   text = cleanUpSpaces(text);
@@ -46,8 +42,8 @@ function removeBrackets() {
 
   }
   const html = text;
+  selectAllFieldNodes(field, sel);
   setFormat("inserthtml", html);
-  // clean_field(field);
 }
 try {
   removeBrackets();

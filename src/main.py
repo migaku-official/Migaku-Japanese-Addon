@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # 
+from anki import models
 from os.path import dirname, join
 import sys, os, platform, re, subprocess, aqt.utils
 from anki.utils import stripHTML, isWin, isMac
@@ -62,9 +63,7 @@ currentNote = False
 currentField = False
 currentKey = False
 mw.MIAJSSettings = None
-undo = join(addon_path, "js", "undo.js")
-with open(undo, "r", encoding="utf-8") as undoFile:
-    undoJS= undoFile.read() 
+
 
 def accentGraphCss():
     css = r" .accentsBlock{line-height:35px;} .museika{width:22px;height:22px;border-radius:50% ;border:1px #db4130 dashed} .pitch-box{position:relative} .pitch-box,.pitch-drop,.pitch-overbar{display:inline-block} .pitch-overbar{background-color:#db4130;height:1px;width:100% ;position:absolute;top:-3px;left:0} .pitch-drop{background-color:#db4130;height:6px;width:2px;position:absolute;top:-3px;right:-2px}"
@@ -316,27 +315,50 @@ def bridgeReroute(self, cmd):
                 field = getFieldName(splitList[2], self.note)
                 mw.Exporter.finalizeIndividualExport(self, splitList[1], field, self.note)
             return
-        elif cmd.startswith('attemptUndo'):
-            name = mw.col.undoName()
-            if name == 'Sentence Accent Generation' or name == 'Word Accent Generation' or name == 'Accent Removal':
-                mw.onUndo()
-            return
     ogReroute(self, cmd)
     
 ogReroute = aqt.editor.Editor.onBridgeCmd 
 aqt.editor.Editor.onBridgeCmd = bridgeReroute
 
-def fetchAudioFromDict(word, yomi, idx):
+
+def grabAudioForMultiReadingWord(word, yomi):
+    idx = 0
+    if word in AccentDict.dictionary:
+        entry = AccentDict.dictionary[word]
+        for term in entry:
+            if term[1] == yomi:
+                if term[4]:
+                    try:
+                        if term[4][idx]:
+                            return term[4][idx][2]
+                    except:
+                        for a in term[4]:
+                            if a[0] == mw.Exporter.dictParser.kaner(yomi):
+                                return a[2]    
+                        return term[4][0][2]
+            idx+= 1
+    return False
+
+
+def grabAudioForMultiPitchWord(word, yomi, idx):
     if word in AccentDict.dictionary:
         entry = AccentDict.dictionary[word]
         for term in entry:  
             if term[1] == yomi:
                 if term[4]:
                     if term[4][idx]:
-                        return term[4][idx][2]
-    return 'no'
+                        return term[4][idx][2]   
+    return False
+
+def fetchAudioFromDict(word, yomi, idx):
+    if idx == 100:
+        return grabAudioForMultiReadingWord(word, yomi)
+    else:
+        return grabAudioForMultiPitchWord(word, yomi, idx)
+    
 
 def clickPlayAudio(cmd):
+
     splitList = cmd.split(';')
     path = fetchAudioFromDict(splitList[1],  splitList[2], int(splitList[3]))
     if path:
@@ -362,8 +384,17 @@ def prevBridgeReroute(self, cmd):
 
 AnkiWebView._onBridgeCmd = wrap(AnkiWebView._onBridgeCmd, prevBridgeReroute)
 
-def addUndoFunctionality(self):
-    self.web.eval(undoJS)
+from typing import List
+from anki.models import NoteType
 
-aqt.editor.Editor.setupWeb = wrap(aqt.editor.Editor.setupWeb, addUndoFunctionality)
+###fixes empty card issues for mia japanese notetype (note types with all conditional fields throw an error)
+# def miaAvailOrds(self,  m: NoteType, flds: str) -> List:
+#     if 'MIA Japanese' in m['name']:
+#         return [0]
+#     else:
+#         return ogAvailOrds(self, m, flds)
 
+
+
+# ogAvailOrds = models.ModelManager.availOrds
+# models.ModelManager.availOrds = miaAvailOrds
