@@ -644,8 +644,6 @@ class AccentExporter:
     def finalizeIndividualExport(self, editor, text, field, note):
         if not note or not field or text == '':
             return
-        # if type(editor.parentWindow) is not AddCards:
-            # self.mw.checkpoint('Word Accent Generation')
         text = self.cleanEntities(text)
         rawString = re.search(r'--IND--.+--IND--', text)
         if not rawString:
@@ -686,10 +684,56 @@ class AccentExporter:
                     editor.web.eval(self.commonJS + self.insertHTMLJS % self.convertMalformedSpaces(newHTML).replace('"', '\\"'))
         if audioGraphList:
             self.addVariants(audioGraphList, note, editor)      
-            # note.flush() 
             # self.reloadEditor()
 
-
+    def fetchIndividualExport(self, text, note):
+        ogtext = text.replace('--IND--', '')
+        if not note or text == '':
+            return ''
+        text = self.cleanEntities(text)
+        rawString = re.search(r'--IND--.+--IND--', text)
+        if not rawString:
+            config = self.getConfig()
+            lookAhead = str(config['LookAhead'])
+            rawString = re.search(r'--IND--.{1,' + lookAhead + r'}', text)
+        if not rawString:
+            return ogtext
+        rawString = rawString.group().replace('--IND--', '')
+        subString = re.search(u'[^　\s◱◲◳◴<>]+', rawString).group()
+        yomi = re.search(r'\[a([^\]]+)\]', subString)
+        if yomi:
+            yomi = self.parseYomi(yomi.group(1))
+        ogString = subString
+        subString = re.sub(r'\[[^\]]+\]', '', subString)
+        newText = subString
+        newText = self.mw.col.media.strip(newText)
+        results = self.dictParser.getParsed(newText)
+        results = self.wordData(results)
+        parsed, audioGraphList = self.dictParser.dictBasedParsing(results, subString, True, False, yomi)
+        if audioGraphList:
+            audioGraphList = [audioGraphList[0]]
+        else:
+            audioGraphList = False
+        if audioGraphList:
+            self.addVariants(audioGraphList, note)
+        textToReturn = ogtext
+        if parsed:
+            parsed = parsed.split(' ')
+            if len(parsed) > 1 and "[" in parsed[1]:
+                parsed = parsed[1]
+                if parsed != ogString:
+                    if yomi:
+                        if ';' in parsed:
+                            parsed = re.search(r'\[[^\[\]]*(;[^\[\]]*\])', parsed).group(1)
+                        newHTML = self.returnEntities(text.replace(rawString, rawString.replace(ogString, re.sub(r';[^\[\]]*\]' , parsed , ogString.replace('[a' , '['))))).replace('--IND--', '')
+                    elif parsed in rawString:
+                        newHTML = self.returnEntities(text.replace(rawString, rawString.replace(parsed, ' ' + parsed + ' '))).replace('--IND--', '')
+                    else:
+                        newHTML = self.returnEntities(text.replace(rawString, rawString.replace(re.sub(r'\[.*\]', '', parsed), ' ' + parsed + ' '))).replace('--IND--', '')
+                    
+                    textToReturn = newHTML
+        return textToReturn
+              
     def wordData(self, results):
         wordResults = []
         for idx, val in enumerate(results):
@@ -839,15 +883,17 @@ class AccentExporter:
         elif overAdd == 'overwrite':
             self.addToNote(editor, note, field, ordinal, sep.replace('<br>', '', 1) + text)
         elif overAdd == 'add':
-            if note[field] == '' or editor:
+            if note[field] in ['', '<br>'] or editor:
                 self.addToNote(editor, note, field, ordinal, note[field] + sep.replace('<br>', '', 1) + text)
             else:
-                self.addToNote(editor, note, field, ordinal, note[field] + sep.replace('<br>', '', 1) + text)
+                self.addToNote(editor, note, field, ordinal, note[field] + sep + text)
         elif overAdd == 'no':
-            if note[field] == '':
+            if note[field] == ['', '<br>']:
                 self.addToNote(editor, note, field, ordinal, sep.replace('<br>', '', 1) + text)
 
     def addToNote(self, editor, note, field, ordinal, text):
+        if text.startswith('<br>'):
+            text = text[4:]
         if ordinal is not False and editor is not False:
             editor.web.eval(self.commonJS + self.insertToFieldJS % (text.replace('"', '\\"'), str(ordinal)))
         else:
