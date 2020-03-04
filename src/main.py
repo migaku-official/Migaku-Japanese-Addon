@@ -367,34 +367,26 @@ def clickPlayAudio(cmd):
             sound.play(path)
 
 def revBridgeReroute(self, cmd):
-    if checkProfile() and getConfig()['PlayAudioOnClick'] == 'on':
-        if cmd.startswith('playAudio;'):
+    if cmd.startswith('playAudio;'):
+        if checkProfile() and getConfig()['PlayAudioOnClick'] == 'on':
             clickPlayAudio(cmd)
             return
-    ogRevReroute(self, cmd)
+    else:
+        ogRevReroute(self, cmd)
 
 ogRevReroute = aqt.reviewer.Reviewer._linkHandler 
 aqt.reviewer.Reviewer._linkHandler = revBridgeReroute
 
 def prevBridgeReroute(self, cmd):
-    if checkProfile() and getConfig()['PlayAudioOnClick'] == 'on':
-        if cmd.startswith('playAudio;'):
+    if cmd.startswith('playAudio;'):
+        if checkProfile() and getConfig()['PlayAudioOnClick'] == 'on':
             clickPlayAudio(cmd)
             return
-
-AnkiWebView._onBridgeCmd = wrap(AnkiWebView._onBridgeCmd, prevBridgeReroute)
-
-from typing import List
-from anki.models import NoteType
-
-###fixes empty card issues for mia japanese notetype (note types with all conditional fields throw an error)
-# def miaAvailOrds(self,  m: NoteType, flds: str) -> List:
-#     if 'MIA Japanese' in m['name']:
-#         return [0]
-#     else:
-#         return ogAvailOrds(self, m, flds)
+    else:
+        ogAnkiWebBridge(self, cmd)
 
 
 
-# ogAvailOrds = models.ModelManager.availOrds
-# models.ModelManager.availOrds = miaAvailOrds
+ogAnkiWebBridge = AnkiWebView._onBridgeCmd
+AnkiWebView._onBridgeCmd = prevBridgeReroute
+
