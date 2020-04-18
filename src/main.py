@@ -156,21 +156,33 @@ def loadAllProfileInformation():
     global colArray
     for prof in mw.pm.profiles():
         cpath = join(mw.pm.base, prof,  'collection.anki2')
-        try:
-            tempCol = Collection(cpath)
-            noteTypes = tempCol.models.all()
-            tempCol.db.close()
-            tempCol = None
-            noteTypeDict = {}
-            for note in noteTypes:
-                noteTypeDict[note['name']] = {"cardTypes" : [], "fields" : []}
-                for ct in note['tmpls']:
-                    noteTypeDict[note['name']]["cardTypes"].append(ct['name'])
-                for f in note['flds']:
-                    noteTypeDict[note['name']]["fields"].append(f['name'])
-            colArray[prof] = noteTypeDict
-        except:
-            miInfo('<b>Warning:</b><br>Your Anki collection could not be loaded, as a result the MIA Japanese Add-on settings menu will not work correctly. This problem typically occurs when creating a new Anki profile. You can <b>fix this issue by simply restarting Anki after loading your new profile for the first time.<b>', level='wrn')
+        if os.path.isfile(cpath):
+            try:
+                tempCol = Collection(cpath)
+                noteTypes = tempCol.models.all()
+                tempCol.db.close()
+                tempCol = None
+                noteTypeDict = {}
+                for note in noteTypes:
+                    noteTypeDict[note['name']] = {"cardTypes" : [], "fields" : []}
+                    for ct in note['tmpls']:
+                        noteTypeDict[note['name']]["cardTypes"].append(ct['name'])
+                        for f in note['flds']:
+                            noteTypeDict[note['name']]["fields"].append(f['name'])
+                            colArray[prof] = noteTypeDict
+            except:
+                miInfo('Unable to load collection ' + cpath)
+        else:
+                miInfo('''
+<b>Warning:</b>
+<br>Your Anki collection for the profile %s (located at %s) could not be loaded.
+<br>As a result the MIA Japanese Add-on settings menu will not work correctly. 
+<br>This problem typically occurs for two reasons: 
+<ol>
+   <li>You just created a new Anki profile. You can <b>fix this issue by simply restarting Anki after loading your new profile for the first time.</b>
+   <li> The folder of a profile has been deleted. You can <b>fix this issue by deleting the profile in anki</b>
+</ol>
+''' % (prof, cpath), level='wrn')
 
 def openGui():
     if not mw.MIAJSSettings:
