@@ -159,7 +159,7 @@ def loadAllProfileInformation():
         try:
             tempCol = Collection(cpath)
             noteTypes = tempCol.models.all()
-            tempCol.db.close()
+            tempCol.close()
             tempCol = None
             noteTypeDict = {}
             for note in noteTypes:
