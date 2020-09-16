@@ -1,4 +1,4 @@
-# Contributing to the MIA Japanese Addon 
+# Contributing to the Migaku Japanese Addon 
 
 ## Important checks
   - Before create any pull requests, please open a issue explaining the situation

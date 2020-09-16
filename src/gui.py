@@ -23,7 +23,7 @@ addon_path = dirname(__file__)
 import platform
 
 class JSGui(QScrollArea):
-    def __init__(self, mw, colArray, MIAModel, reboot, CSSJSHandler, UEManager):
+    def __init__(self, mw, colArray, MigakuModel, reboot, CSSJSHandler, UEManager):
         super(JSGui, self).__init__()
         self.mw = mw 
         self.cA = self.updateCurrentProfileInfo(colArray)
@@ -56,14 +56,14 @@ class JSGui(QScrollArea):
             'kanjireading' : 'Kanji Reading', 'coloredkanjireading' : 'Colored Kanji Reading',
             'reading' : 'Reading', 'coloredreading' : 'Colored Reading'
             }
-        self.MIAModel = MIAModel
+        self.MigakuModel = MigakuModel
         self.selectedProfiles = []
         self.selectedAudioFields = []
         self.selectedGraphFields = []
         self.buttonStatus = 0
         self.selectedRow = False
         self.initializing = False
-        self.addMIANoteTypeOnApply = False
+        self.addMigakuNoteTypeOnApply = False
         self.sortedProfiles = False
         self.sortedNoteTypes = False
         self.importW = False
@@ -71,8 +71,8 @@ class JSGui(QScrollArea):
         self.setInitialValues()
 
     def setInitialValues(self):
-        self.setWindowIcon(QIcon(join(addon_path, 'icons', 'mia.png')))
-        self.setWindowTitle("Japanese Settings")
+        self.setWindowIcon(QIcon(join(addon_path, 'icons', 'migaku.png')))
+        self.setWindowTitle("Migaku Japanese Settings")
         self.cont.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         self.cont.setFixedSize(1167, 725)
         self.setWidget(self.cont)
@@ -81,7 +81,7 @@ class JSGui(QScrollArea):
         self.initActiveFieldsCB()
         self.setToolTips()
         self.loadCurrentAFs()
-        self.loadCSSJSAddMIA()
+        self.loadCSSJSAddMigaku()
         self.handleAutoCSSJS()
         self.loadProfileCB()
         self.loadProfilesList()
@@ -161,7 +161,7 @@ class JSGui(QScrollArea):
             self.arMenu.hide()
         if self.importW:
             self.importW.hide()
-        self.mw.MIAJSSettings = None
+        self.mw.MigakuJSSettings = None
         event.accept() 
 
     def hideEvent(self, event):
@@ -237,15 +237,15 @@ class JSGui(QScrollArea):
             self.reboot()
 
 
-    def loadCSSJSAddMIA(self):
+    def loadCSSJSAddMigaku(self):
         if self.config['AutoCssJsGeneration'].lower() == 'on':
             self.ui.autoCSSJS.setChecked(True)
-        if self.config['AddMIAJapaneseTemplate'].lower() == 'on':
-            self.ui.addMIANoteType.setChecked(True)
+        if self.config['AddMigakuJapaneseTemplate'].lower() == 'on':
+            self.ui.addMigakuNoteType.setChecked(True)
 
     def initHandlers(self):
         self.ui.autoCSSJS.toggled.connect(self.handleAutoCSSJS)
-        self.ui.addMIANoteType.toggled.connect(self.handleAddMIA)
+        self.ui.addMigakuNoteType.toggled.connect(self.handleAddMigaku)
         self.ui.activeProfileCB.currentIndexChanged.connect(self.profileChange )
         self.ui.activeNoteTypeCB.currentIndexChanged.connect(self.noteTypeChange)
         self.ui.activeCardTypeCB.currentIndexChanged.connect(self.selectionChange)
@@ -280,14 +280,11 @@ class JSGui(QScrollArea):
         self.ui.runRulesButton.clicked.connect(self.applyAllRules)
         self.ui.searchRulesLE.returnPressed.connect(self.initRuleSearch)
         self.ui.searchRulesButton.clicked.connect(self.initRuleSearch)
-        self.ui.miaSiteIcon.clicked.connect(lambda: openLink('https://massimmersionapproach.com/'))
-        self.ui.miaFBIcon.clicked.connect(lambda: openLink('https://www.facebook.com/MassImmersionApproach/'))
-        self.ui.miaPatreonIcon.clicked.connect(lambda: openLink('https://www.patreon.com/massimmersionapproach'))
-        self.ui.mattYT.clicked.connect(lambda: openLink('https://www.youtube.com/user/MATTvsJapan?sub_confirmation=1'))
-        self.ui.mattTW.clicked.connect(lambda: openLink('https://twitter.com/mattvsjapan'))
-        self.ui.yogaYT.clicked.connect(lambda: openLink('https://www.youtube.com/c/yogamia?sub_confirmation=1'))
-        self.ui.yogaTW.clicked.connect(lambda: openLink('https://twitter.com/Yoga_MIA'))
-        self.ui.gitHubIcon.clicked.connect(lambda: openLink('https://github.com/mass-immersion-approach'))
+
+        self.ui.migakuPatreonIcon.clicked.connect(lambda: openLink('https://www.patreon.com/Migaku'))
+        self.ui.migakuInfoYT.clicked.connect(lambda: openLink('https://www.youtube.com/c/ImmerseWithYoga'))
+        self.ui.migakuInfoTW.clicked.connect(lambda: openLink('https://twitter.com/Migaku_Yoga'))
+        self.ui.gitHubIcon.clicked.connect(lambda: openLink('https://github.com/migaku-official/Migaku-Japanese-Addon'))
 
     def initRuleSearch(self):
         text = self.ui.searchRulesLE.text()
@@ -428,11 +425,11 @@ class JSGui(QScrollArea):
     def disableSep(self, sep):
         sep.setEnabled(False)    
 
-    def handleAddMIA(self):
-        if self.ui.addMIANoteType.isChecked():
-            if not self.checkMIANoteExistence():
-                self.addMIANoteTypeOnApply = True
-                self.resetMIAActiveFields()
+    def handleAddMigaku(self):
+        if self.ui.addMigakuNoteType.isChecked():
+            if not self.checkMigakuNoteExistence():
+                self.addMigakuNoteTypeOnApply = True
+                self.resetMigakuActiveFields()
 
     def loadLookAhead(self):
         self.ui.lookAhead.setValue(self.config['LookAhead'])
@@ -496,28 +493,28 @@ class JSGui(QScrollArea):
         if options[2].lower() == 'on' :
             accents.setChecked(True)
 
-    def resetMIAActiveFields(self):
-        self.removeMIAFields()
-        self.addMIAFields()
+    def resetMigakuActiveFields(self):
+        self.removeMigakuFields()
+        self.addMigakuFields()
         
-    def checkMIANoteExistence(self):
+    def checkMigakuNoteExistence(self):
         models = self.mw.col.models.all()
         for model in models:
-            if model['name'] == 'MIA Japanese':
+            if model['name'] == 'Migaku Japanese':
                 return True
         return False
 
-    def removeMIAFields(self):
+    def removeMigakuFields(self):
         afList = self.ui.listWidget
         for i in reversed(range(afList.rowCount())):
-            if afList.item(i, 1).text() == 'MIA Japanese':
+            if afList.item(i, 1).text() == 'Migaku Japanese':
                 self.ui.listWidget.removeRow(i)
 
 
-    def addMIAFields(self):
-        self.addToList('All', 'MIA Japanese', 'Sentence', 'Expression', 'Front', 'Colored Hover')
-        self.addToList('All', 'MIA Japanese', 'Sentence', 'Expression', 'Back', 'Colored Kanji Reading')
-        self.addToList('All', 'MIA Japanese', 'Sentence', 'Meaning', 'Back', 'Colored Hover')
+    def addMigakuFields(self):
+        self.addToList('All', 'Migaku Japanese', 'Sentence', 'Expression', 'Front', 'Colored Hover')
+        self.addToList('All', 'Migaku Japanese', 'Sentence', 'Expression', 'Back', 'Colored Kanji Reading')
+        self.addToList('All', 'Migaku Japanese', 'Sentence', 'Meaning', 'Back', 'Colored Hover')
 
     def handleAutoCSSJS(self):
         if self.ui.autoCSSJS.isChecked():
@@ -528,7 +525,7 @@ class JSGui(QScrollArea):
             self.ui.activeSideCB.setEnabled(True)
             self.ui.activeDisplayTypeCB.setEnabled(True)
             self.ui.activeActionButton.setEnabled(True)
-            self.ui.addMIANoteType.setEnabled(True)
+            self.ui.addMigakuNoteType.setEnabled(True)
             self.ui.listWidget.setEnabled(True)
 
         else:
@@ -539,7 +536,7 @@ class JSGui(QScrollArea):
             self.ui.activeSideCB.setEnabled(False)
             self.ui.activeDisplayTypeCB.setEnabled(False)
             self.ui.activeActionButton.setEnabled(False)
-            self.ui.addMIANoteType.setEnabled(False)
+            self.ui.addMigakuNoteType.setEnabled(False)
             self.ui.listWidget.setEnabled(False)
 
     def selectionChange(self):
@@ -580,30 +577,30 @@ class JSGui(QScrollArea):
                     prof = 'All'
                 self.addToList(prof, afl[2], afl[3], afl[4], afl[5][0].upper() + afl[5][1:].lower() , self.displayTranslation[dt])
 
-    def saveCSSJSAddMIA(self):
-        mia = 'off'
+    def saveCSSJSAddMigaku(self):
+        migaku = 'off'
         css = 'off'
         if self.ui.autoCSSJS.isChecked():
             css = 'on'
-        if self.ui.addMIANoteType.isChecked():
-            mia = 'on'
-        return css, mia;   
+        if self.ui.addMigakuNoteType.isChecked():
+            migaku = 'on'
+        return css, migaku;   
 
     def saveConfiguration(self):
         sc, wc = self.saveSentenceWordConfig()
         ffs, la = self.saveNumberConfigOptions()
         ac, gc = self.saveAudioGraphsConfig()
         colors = self.saveHANOK()
-        addmia, bo, autocss, ds, goh, gohb, kc, poc = self.saveBinaryOptions()
+        addmigaku, bo, autocss, ds, goh, gohb, kc, poc = self.saveBinaryOptions()
         newConf = {"ActiveFields" : self.saveActiveFields(), "Individual:Kana;DictForm;Pitch;Audio;Graphs" : wc, "Group:Kana;DictForm;Pitch;Audio;Graphs": sc,
          "FuriganaFontSize" : ffs, "LookAhead" : la, "Profiles" : self.saveProfilesConfig(),
-         "AudioFields" : ac, "PitchGraphFields" :  gc, "ColorsHANOK" : colors, "AddMIAJapaneseTemplate": addmia, "BufferedOutput" :  bo,
+         "AudioFields" : ac, "PitchGraphFields" :  gc, "ColorsHANOK" : colors, "AddMigakuJapaneseTemplate": addmigaku, "BufferedOutput" :  bo,
          "AutoCssJsGeneration" : autocss, "DisplayShapes" : ds, "GraphOnHover" : goh, "GraphOnHoverBack" : gohb, "KatakanaConversion" : kc, "PlayAudioOnClick" : poc,
          "HistoricalConversion" : self.saveHistoricalConversion()
 
          }
-        if self.addMIANoteTypeOnApply:
-            self.MIAModel.addModels() 
+        if self.addMigakuNoteTypeOnApply:
+            self.MigakuModel.addModels() 
         self.mw.addonManager.writeConfig(__name__, newConf)
         self.CSSJSHandler.injectWrapperElements()
         self.hide()
@@ -621,7 +618,7 @@ class JSGui(QScrollArea):
             return 'off'
 
     def saveBinaryOptions(self):
-        addmia = 'off'
+        addmigaku = 'off'
         bo = 'off'
         autocss = 'off'
         ds = 'off'
@@ -629,8 +626,8 @@ class JSGui(QScrollArea):
         gohb = 'off'
         kc = 'off'
         poc = 'off'
-        if self.ui.addMIANoteType.isChecked():
-            addmia = 'on'
+        if self.ui.addMigakuNoteType.isChecked():
+            addmigaku = 'on'
         if self.ui.bufferedOutput.isChecked():
             bo = 'on'
         if self.ui.autoCSSJS.isChecked():
@@ -645,7 +642,7 @@ class JSGui(QScrollArea):
             kc = 'on'
         if self.ui.audioOnClick.isChecked():
             poc = 'on'
-        return addmia, bo, autocss, ds, goh, gohb, kc, poc;
+        return addmigaku, bo, autocss, ds, goh, gohb, kc, poc;
 
     def saveHANOK(self):
         return [self.ui.heibanColor.text(), self.ui.atamadakaColor.text(), self.ui.nakadakaColor.text(), self.ui.odakaColor.text(), self.ui.kifukuColor.text()]
@@ -926,7 +923,7 @@ class JSGui(QScrollArea):
         self.ui.activeSideCB.setToolTip(self.sideTT)
         self.ui.activeDisplayTypeCB.setToolTip(self.displayTypeTT)
         self.ui.autoCSSJS.setToolTip('If checked, the addon will manage the CSS and JS of all note and card types designated in the active fields list below.\nIf this is disabled the user is responsible for ensuring that their CSS and JS functions as they wish.')
-        self.ui.addMIANoteType.setToolTip('If checked, the addon will attempt to add the MIA Japanese Note Type if it does not already exist.\nIt will also regenerate the active fields for the MIA Japanese Note Type.')
+        self.ui.addMigakuNoteType.setToolTip('If checked, the addon will attempt to add the Migaku Japanese Note Type if it does not already exist.\nIt will also regenerate the active fields for the Migaku Japanese Note Type.')
         self.ui.profilesCB.setToolTip('These are the profiles that the add-on will be active on.\nWhen set to "All", the add-on will be active on all profiles.')
         self.ui.sentenceKana.setToolTip('When checked, the addon will generate the kana reading of all\nrecognized words within the target field.')
         self.ui.sentenceDictForm.setToolTip('When checked, the addon will generate the dictionary form of all\nrecognized verbs and adjectives within the target field.')

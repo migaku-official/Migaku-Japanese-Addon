@@ -5,7 +5,7 @@ from anki.stdmodels import models
 from anki.hooks import addHook
 from shutil import copyfile
 modelList = []
-name = 'MIA Japanese'
+name = 'Migaku Japanese'
 fields = ['Expression',  'Meaning', 'Audio', 'Audio on Front']
 
 front = '''<div class="tags">
@@ -63,7 +63,7 @@ padding-top: 15px;
 
 modelList.append([name, fields, front, back])
 def addModels():
-    if mw.addonManager.getConfig(__name__)['AddMIAJapaneseTemplate'].lower() != 'on':
+    if mw.addonManager.getConfig(__name__)['AddMigakuJapaneseTemplate'].lower() != 'on':
         return
     for model in modelList:
         if not mw.col.models.byName(model[0]):

@@ -1,6 +1,6 @@
 {   
     "Profiles" : ["all"],
-    "AddMIAJapaneseTemplate": "on",
+    "AddMigakuJapaneseTemplate": "on",
     "LookAhead" :  25,
     "FuriganaFontSize" :  4,
     "BufferedOutput" : "off",
@@ -17,9 +17,9 @@
     "AudioFields" : "Audio;overwrite",
     "PlayAudioOnClick" : "on",
     "ActiveFields": [
-                        "coloredhover;all;MIA Japanese;Sentence;Expression;front",
-                        "coloredkanjireading;all;MIA Japanese;Sentence;Expression;back",
-                        "coloredhover;all;MIA Japanese;Sentence;Meaning;back"
+                        "coloredhover;all;Migaku Japanese;Sentence;Expression;front",
+                        "coloredkanjireading;all;Migaku Japanese;Sentence;Expression;back",
+                        "coloredhover;all;Migaku Japanese;Sentence;Meaning;back"
                     ]
 
 }

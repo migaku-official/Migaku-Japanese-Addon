@@ -1,24 +1,20 @@
-<h2 align="center">MIA Japanese Addon</h2>
+<h2 align="center">Migaku Japanese Addon</h2>
 
 <p align="center">
 <a title="Rate on AnkiWeb" href="https://ankiweb.net/shared/info/278530045"><img src="https://glutanimate.com/logos/ankiweb-rate.svg"></a>
-<a title="License: GNU AGPLv3" href="https://github.com/mass-immersion-approach/MIA-Japanese-Add-on/blob/master/LICENSE"><img  src="https://img.shields.io/badge/license-GNU AGPLv3-green.svg"></a>
+<a title="License: GNU AGPLv3" href="https://github.com/migaku-official/Migaku-Japanese-Addon/blob/master/LICENSE"><img  src="https://img.shields.io/badge/license-GNU AGPLv3-green.svg"></a>
 <br>
-<a title="Buy us a coffee :)" href="https://ko-fi.com/massimmersionapproach"><img src="https://img.shields.io/badge/ko--fi-contribute-%23579ebd.svg"></a>
-<a title="Support us on Patreon" href="https://www.patreon.com/massimmersionapproach/posts"><img src="https://img.shields.io/badge/patreon-support-orange.svg"></a>
+<a title="Support us on Patreon" href="https://www.patreon.com/Migaku"><img src="https://img.shields.io/badge/patreon-support-orange.svg"></a>
 <br>
-<a title="Subscribe to YogaMIA" href="https://www.youtube.com/c/yogamia"><img src="https://img.shields.io/badge/YouTube-YogaMIA-red.svg"></a>
-<a title="Subscribe to Matt vs Japan" href="https://www.youtube.com/user/MATTvsJapan"><img src="https://img.shields.io/badge/YouTube-Matt vs Japan-red.svg"></a>
+<a title="Subscribe to Immerse with Migaku" href="https://www.youtube.com/c/ImmerseWithYoga"><img src="https://img.shields.io/badge/YouTube-Immerse%20with%20Yoga-red"></a>
 <br>
-<a title="Follow me on Twitter" href="https://twitter.com/intent/user?screen_name=Yoga_MIA"><img src="https://img.shields.io/twitter/follow/Yoga_MIA.svg"></a>
-<a title="Follow me on Twitter" href="https://twitter.com/intent/user?screen_name=mattvsjapan"><img src="https://img.shields.io/twitter/follow/mattvsjapan.svg"></a>
+<a title="Follow us on Twitter" href="https://twitter.com/Migaku_Yoga"><img src="https://img.shields.io/badge/Twitter-Immerse%20with%20Yoga-blue"></a>
 </p>
 
->Add readings and pitch accent to Japanese words in Anki
+>Add readings and pitch accent information to Japanese words, allows playing audio when clicking a word, export pitch accent graphs, convert to katakana, or historical kanji and kana and much more!
 
 ### Table of Contents
 
-- [Tutorial](https://massimmersionapproach.com/table-of-contents/anki/mia-japanese-addon)
 - [Installation](#installation)
 - [Documentation](#documentation)
 - [Contributing](#contributing)
@@ -26,7 +22,7 @@
 
 ### Installation
 
-1. Make sure you have the [latest version](https://apps.ankiweb.net/#download) of Anki 2.1 installed.
+1. Install the version of Anki that is listed under the "Migaku Development Cycles" section of the AnkiWeb add-on [page](https://ankiweb.net/shared/info/278530045).
 2. Download the latest version of the addon from [AnkiWeb](https://ankiweb.net/shared/info/278530045)
 
 ### Documentation
@@ -43,11 +39,11 @@ Contributions are welcome! Please review the [contribution guidelines](./.github
 
 ### License and Credits
 
-*MIA Japanese* is
+*Migaku Japanese* is
 
-*Copyright © 2019 Mass Immersion Approach
+*Copyright © 2020 Migaku ltd.
 
-MIA Japanese is free and open-source software. The add-on code that runs within Anki is released under the GNU AGPLv3 license, extended by a number of additional terms. For more information please see the [LICENSE](https://github.com/mass-immersion-approach/MIA-Japanese-Add-on/blob/master/LICENSE) file that accompanied this program.
+Migaku Japanese is free and open-source software. The add-on code that runs within Anki is released under the GNU AGPLv3 license, extended by a number of additional terms. For more information please see the [LICENSE](https://github.com/migaku-official/Migaku-Japanese-Addon/blob/master/LICENSE) file that accompanied this program.
 
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY.
 

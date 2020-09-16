@@ -9,16 +9,16 @@ addon_path = dirname(__file__)
 
 def miInfo(text, parent=False, level = 'msg'):
     if level == 'wrn':
-        title = "Japanese - Warning"
+        title = "Migaku Japanese - Warning"
     elif level == 'not':
-        title = "Japanese - Notice"
+        title = "Migaku Japanese - Notice"
     elif level == 'err':
-        title = "Japanese - Error"
+        title = "Migaku Japanese - Error"
     else:
-        title = "Japanese"
+        title = "Migaku Japanese"
     if parent is False:
         parent = aqt.mw.app.activeWindow() or aqt.mw
-    icon = QIcon(join(addon_path, 'icons', 'mia.png'))
+    icon = QIcon(join(addon_path, 'icons', 'migaku.png'))
     mb = QMessageBox(parent)
     mb.setText(text)
     mb.setWindowIcon(icon)
@@ -30,9 +30,9 @@ def miInfo(text, parent=False, level = 'msg'):
 
 def miAsk(text, parent=None, day=True):
     msg = QMessageBox(parent)
-    msg.setWindowTitle("Japanese")
+    msg.setWindowTitle("Migaku Japanese")
     msg.setText(text)
-    icon = QIcon(join(addon_path, 'icons', 'mia.png'))
+    icon = QIcon(join(addon_path, 'icons', 'migaku.png'))
     b = msg.addButton(QMessageBox.Yes)
     b.setFixedSize(100, 30)
     b.setDefault(True)

@@ -206,7 +206,7 @@ class UserExceptionManager:
                 self.addMenu = QWidget(editor)
         else:
             self.addMenu = QWidget(self.mw)
-        self.addMenu.setWindowIcon(QIcon(join(self.addon_path, 'icons', 'mia.png')))
+        self.addMenu.setWindowIcon(QIcon(join(self.addon_path, 'icons', 'migaku.png')))
         self.addMenu.setWindowFlags(Qt.Dialog |Qt.MSWindowsFixedSizeDialogHint)
         self.addMenu.ui = Ui_Form()
         self.addMenu.ui.setupUi(self.addMenu)

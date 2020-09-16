@@ -20,7 +20,7 @@ from anki import sound
 from anki.find import Finder
 from anki import Collection
 from aqt.main import AnkiQt
-from . import models as MIAModel
+from . import models as MigakuModel
 from shutil import copyfile
 from os.path import join, exists
 from aqt.webview import AnkiWebView
@@ -62,7 +62,7 @@ config = mw.addonManager.getConfig(__name__)
 currentNote = False 
 currentField = False
 currentKey = False
-mw.MIAJSSettings = None
+mw.MigakuJSSettings = None
 
 
 def accentGraphCss():
@@ -170,45 +170,45 @@ def loadAllProfileInformation():
                     noteTypeDict[note['name']]["fields"].append(f['name'])
             colArray[prof] = noteTypeDict
         except:
-            miInfo('<b>Warning:</b><br>Your Anki collection could not be loaded, as a result the MIA Japanese Add-on settings menu will not work correctly. This problem typically occurs when creating a new Anki profile. You can <b>fix this issue by simply restarting Anki after loading your new profile for the first time.<b>', level='wrn')
+            miInfo('<b>Warning:</b><br>Your Anki collection could not be loaded, as a result the Migaku Japanese Add-on settings menu will not work correctly. This problem typically occurs when creating a new Anki profile. You can <b>fix this issue by simply restarting Anki after loading your new profile for the first time.<b>', level='wrn')
 
 def openGui():
-    if not mw.MIAJSSettings:
-        mw.MIAJSSettings = JSGui(mw, colArray, MIAModel, openGui, mw.CSSJSHandler, UEManager)
-    mw.MIAJSSettings.show()
-    if mw.MIAJSSettings.windowState() == Qt.WindowMinimized:
+    if not mw.MigakuJSSettings:
+        mw.MigakuJSSettings = JSGui(mw, colArray, MigakuModel, openGui, mw.CSSJSHandler, UEManager)
+    mw.MigakuJSSettings.show()
+    if mw.MigakuJSSettings.windowState() == Qt.WindowMinimized:
             # Window is minimised. Restore it.
-           mw.MIAJSSettings.setWindowState(Qt.WindowNoState)
-    mw.MIAJSSettings.setFocus()
-    mw.MIAJSSettings.activateWindow()
+           mw.MigakuJSSettings.setWindowState(Qt.WindowNoState)
+    mw.MigakuJSSettings.setFocus()
+    mw.MigakuJSSettings.activateWindow()
 
      
 def setupGuiMenu():
     addMenu = False
-    if not hasattr(mw, 'MIAMainMenu'):
-        mw.MIAMainMenu = QMenu('MIA',  mw)
+    if not hasattr(mw, 'MigakuMainMenu'):
+        mw.MigakuMainMenu = QMenu('Migaku',  mw)
         addMenu = True
-    if not hasattr(mw, 'MIAMenuSettings'):
-        mw.MIAMenuSettings = []
-    if not hasattr(mw, 'MIAMenuActions'):
-        mw.MIAMenuActions = []
+    if not hasattr(mw, 'MigakuMenuSettings'):
+        mw.MigakuMenuSettings = []
+    if not hasattr(mw, 'MigakuMenuActions'):
+        mw.MigakuMenuActions = []
 
     setting = QAction("Japanese Settings", mw)
     setting.triggered.connect(openGui)
-    mw.MIAMenuSettings.append(setting)
+    mw.MigakuMenuSettings.append(setting)
     action = QAction("Add Parsing Overwrite Rule", mw)
     action.triggered.connect(UEManager.openAddMenu)
-    mw.MIAMenuActions.append(action)
+    mw.MigakuMenuActions.append(action)
 
-    mw.MIAMainMenu.clear()
-    for act in mw.MIAMenuSettings:
-        mw.MIAMainMenu.addAction(act)
-    mw.MIAMainMenu.addSeparator()
-    for act in mw.MIAMenuActions:
-        mw.MIAMainMenu.addAction(act)
+    mw.MigakuMainMenu.clear()
+    for act in mw.MigakuMenuSettings:
+        mw.MigakuMainMenu.addAction(act)
+    mw.MigakuMainMenu.addSeparator()
+    for act in mw.MigakuMenuActions:
+        mw.MigakuMainMenu.addAction(act)
 
     if addMenu:
-        mw.form.menubar.insertMenu(mw.form.menuHelp.menuAction(), mw.MIAMainMenu)
+        mw.form.menubar.insertMenu(mw.form.menuHelp.menuAction(), mw.MigakuMainMenu)
 
 setupGuiMenu()
 AnkiQt.loadProfile = wrap(AnkiQt.loadProfile, loadCollectionArray, 'before')

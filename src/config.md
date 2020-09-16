@@ -4,7 +4,7 @@ There are eight different display types: "kanji", "coloredkanji", "kanjireading"
 The Profile Name can be set to "all" to function on all profiles.
 The Side can be set to "front", "back", or "both".
 
-*AddMIAJapaneseTemplate*: "on" or "off", tells the add-on whether to create the "MIA Japanese" note type or not.
+*AddMigakuJapaneseTemplate*: "on" or "off", tells the add-on whether to create the "Migaku Japanese" note type or not.
 
 *AudioFields*: "FieldName;ExportType(;delimiter)"
 The Field Name can be set to any field in your collection, if that field exists on a particular card then the audio link(s) will automatically be exported to that field. If you set Field Name to "clipboard" the link to the audio file(s) will be copied to the clipboard.

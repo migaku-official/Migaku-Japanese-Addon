@@ -22,7 +22,7 @@ class MassExporter:
         if notes:
             fields = anki.find.fieldNamesForNotes(self.mw.col, notes)
             generateWidget = QDialog(None, Qt.Window)
-            generateWidget.setWindowIcon(QIcon(join(self.addon_path, 'icons', 'mia.png')))
+            generateWidget.setWindowIcon(QIcon(join(self.addon_path, 'icons', 'migaku.png')))
             layout = QHBoxLayout()
             cbLabel = QLabel()
             cbLabel.setText('Origin:')
@@ -96,7 +96,7 @@ class MassExporter:
           return text
 
     def massRemoveHTML(self, field,  notes, generateWidget):
-        if not miAsk('Are you sure you want to mass remove HTML from the "'+ field +'" field? This will not remove images, or "<br>" defined line breaks, but will remove pitch shapes from the previous beta version of the MIA Japanese Addon.'):
+        if not miAsk('Are you sure you want to mass remove HTML from the "'+ field +'" field? This will not remove images, or "<br>" defined line breaks, but will remove pitch shapes from the previous beta version of the Migaku Japanese Addon.'):
             return
         self.mw.checkpoint('Mass HTML Removal')    
         generateWidget.close() 
@@ -124,7 +124,7 @@ class MassExporter:
         progressWidget.setFixedSize(400, 70)
         progressWidget.setWindowModality(Qt.ApplicationModal)
         progressWidget.setWindowTitle('Generating...')
-        progressWidget.setWindowIcon(QIcon(join(self.addon_path, 'icons', 'mia.png')))
+        progressWidget.setWindowIcon(QIcon(join(self.addon_path, 'icons', 'migaku.png')))
         bar = QProgressBar(progressWidget)
         if isMac:
             bar.setFixedSize(380, 50)

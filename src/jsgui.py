@@ -6,7 +6,7 @@ from os.path import dirname, join
 from anki.utils import isMac, isWin, isLin
 import platform
 
-class MIALabel(QtWidgets.QLabel):
+class MigakuLabel(QtWidgets.QLabel):
     clicked=QtCore.pyqtSignal()
     def __init__(self, parent=None):
         QtWidgets.QLabel.__init__(self, parent)
@@ -14,7 +14,7 @@ class MIALabel(QtWidgets.QLabel):
     def mousePressEvent(self, ev):
         self.clicked.emit()
 
-class MIASVG(QtSvg.QSvgWidget):
+class MigakuSVG(QtSvg.QSvgWidget):
     clicked=QtCore.pyqtSignal()
     def __init__(self, parent=None):
         QtSvg.QSvgWidget.__init__(self, parent)
@@ -32,7 +32,7 @@ class Ui_Dialog(object):
         macLin = False
         if isMac  or isLin:
             macLin = True
-        Dialog.setObjectName("MIAJapaneseSupportSettings")
+        Dialog.setObjectName("MigakuJapaneseSupportSettings")
         Dialog.setWindowModality(QtCore.Qt.ApplicationModal)
         Dialog.resize(1167, 725)
         Dialog.setContextMenuPolicy(QtCore.Qt.NoContextMenu)
@@ -529,10 +529,10 @@ class Ui_Dialog(object):
         self.autoCSSJS.setText("")
         self.autoCSSJS.setObjectName("autoCSSJS")
         self.gridLayout.addWidget(self.autoCSSJS, 0, 1, 1, 1)
-        self.addMIANoteType = QtWidgets.QCheckBox(self.tab)
-        self.addMIANoteType.setText("")
-        self.addMIANoteType.setObjectName("addMIANoteType")
-        self.gridLayout.addWidget(self.addMIANoteType, 0, 3, 1, 1)
+        self.addMigakuNoteType = QtWidgets.QCheckBox(self.tab)
+        self.addMigakuNoteType.setText("")
+        self.addMigakuNoteType.setObjectName("addMigakuNoteType")
+        self.gridLayout.addWidget(self.addMigakuNoteType, 0, 3, 1, 1)
         self.listWidget = QtWidgets.QTableWidget(self.tab)
         if isWin and platform.release() == '10':
             self.listWidget.setStyleSheet(
@@ -709,94 +709,66 @@ class Ui_Dialog(object):
         self.tab_4 = QtWidgets.QWidget()
         self.tab_4.setObjectName("tab_4")
         self.tab4vl = QtWidgets.QVBoxLayout()
-        self.miaAbout = QtWidgets.QGroupBox()
-        self.miaAbout.setTitle('Mass Immersion Approach')
-        self.miaAboutVL = QtWidgets.QVBoxLayout()
+        self.migakuAbout = QtWidgets.QGroupBox()
+        self.migakuAbout.setTitle('Migaku')
+        self.migakuAboutVL = QtWidgets.QVBoxLayout()
 
-        self.miaAbout.setStyleSheet("QGroupBox { font-weight: bold; } ")
-        self.miaAboutText = QtWidgets.QLabel("This an original MIA add-on. MIA, or “Mass Immersion Approach,” is a comprehensive approach to acquiring foreign languages. You can learn more <a href='https://massimmersionapproach.com'>here</a>.")
-        self.miaAboutText.setWordWrap(True);
-        self.miaAboutText.setOpenExternalLinks(True);
-        self.miaAbout.setLayout(self.miaAboutVL)
-        self.miaAboutLinksTitle = QtWidgets.QLabel("<b>Links<b>")
-        self.miaAboutLinksMIA = QtWidgets.QLabel("MIA:")
-        self.miaAboutLinksHL1 = QtWidgets.QHBoxLayout()
+        self.migakuAbout.setStyleSheet("QGroupBox { font-weight: bold; } ")
+        self.migakuAboutText = QtWidgets.QLabel("This an original Migaku add-on. Migaku seeks to be a comprehensive platform for acquiring foreign languages. The official Migaku website will be published soon!")
+        self.migakuAboutText.setWordWrap(True);
+        self.migakuAboutText.setOpenExternalLinks(True);
+        self.migakuAbout.setLayout(self.migakuAboutVL)
+        self.migakuAboutLinksTitle = QtWidgets.QLabel("<b>Links<b>")
 
-        self.miaSiteIcon = self.getSVGWidget('MIA.svg')
-        self.miaSiteIcon.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.migakuPatreonIcon = self.getSVGWidget('Patreon.svg')
+        self.migakuPatreonIcon.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
 
-        self.miaFBIcon = self.getSVGWidget('Facebook.svg')
-        self.miaFBIcon.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.migakuAboutLinksHL3 = QtWidgets.QHBoxLayout()
 
-        self.miaPatreonIcon = self.getSVGWidget('Patreon.svg')
-        self.miaPatreonIcon.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.migakuInfo = QtWidgets.QLabel("Migaku:")
+        self.migakuInfoYT = self.getSVGWidget('Youtube.svg')
+        self.migakuInfoYT.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
 
-        self.miaAboutLinksHL1.addWidget(self.miaAboutLinksMIA)
-        self.miaAboutLinksHL1.addWidget(self.miaSiteIcon)
-        self.miaAboutLinksHL1.addWidget(self.miaFBIcon)
-        self.miaAboutLinksHL1.addWidget(self.miaPatreonIcon)
-        self.miaAboutLinksHL1.addStretch()
-        self.miaAboutLinksHL2 = QtWidgets.QHBoxLayout()
-        self.miaAboutLinksHL3 = QtWidgets.QHBoxLayout()
+        self.migakuInfoTW = self.getSVGWidget('Twitter.svg')
+        self.migakuInfoTW.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
 
-        self.matt = QtWidgets.QLabel("Matt vs. Japan:")
-        self.mattYT = MIALabel()
+        self.migakuAboutLinksHL3.addWidget(self.migakuInfo)
+        self.migakuAboutLinksHL3.addWidget(self.migakuInfoYT)
+        self.migakuAboutLinksHL3.addWidget(self.migakuInfoTW)
+        self.migakuAboutLinksHL3.addWidget(self.migakuPatreonIcon)
+        self.migakuAboutLinksHL3.addStretch()
 
-        self.mattYT = self.getSVGWidget('Youtube.svg')
-        self.mattYT.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-            
-        self.mattTW = self.getSVGWidget('Twitter.svg')
-        self.mattTW.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-
-        self.miaAboutLinksHL2.addWidget(self.matt)
-        self.miaAboutLinksHL2.addWidget(self.mattYT)
-        self.miaAboutLinksHL2.addWidget(self.mattTW)
-        self.miaAboutLinksHL2.addStretch()
-
-        self.yoga = QtWidgets.QLabel("Yoga MIA:")
-        self.yogaYT = self.getSVGWidget('Youtube.svg')
-        self.yogaYT.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-
-        self.yogaTW = self.getSVGWidget('Twitter.svg')
-        self.yogaTW.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-
-        self.miaAboutLinksHL3.addWidget(self.yoga)
-        self.miaAboutLinksHL3.addWidget(self.yogaYT)
-        self.miaAboutLinksHL3.addWidget(self.yogaTW)
-        self.miaAboutLinksHL3.addStretch()
-
-        self.miaAboutVL.addWidget(self.miaAboutText)
-        self.miaAboutVL.addWidget(self.miaAboutLinksTitle)
-        self.miaAboutVL.addLayout(self.miaAboutLinksHL1)
-        self.miaAboutVL.addLayout(self.miaAboutLinksHL2)
-        self.miaAboutVL.addLayout(self.miaAboutLinksHL3)
+        self.migakuAboutVL.addWidget(self.migakuAboutText)
+        self.migakuAboutVL.addWidget(self.migakuAboutLinksTitle)
         
-        self.miaContact = QtWidgets.QGroupBox()
-        self.miaContact.setTitle('Contact Us')
-        self.miaContactVL = QtWidgets.QVBoxLayout()
-        self.miaContact.setStyleSheet("QGroupBox { font-weight: bold; } ")
-        self.miaContactText = QtWidgets.QLabel("If you would like to report a bug or contribute to the add-on, the best way to do so is by starting a ticket or pull request on GitHub. If you are looking for personal assistance using the add-on, check out the MIA Patreon Discord Server.")
-        self.miaContactText.setWordWrap(True)
+        self.migakuAboutVL.addLayout(self.migakuAboutLinksHL3)
+        
+        self.migakuContact = QtWidgets.QGroupBox()
+        self.migakuContact.setTitle('Contact Us')
+        self.migakuContactVL = QtWidgets.QVBoxLayout()
+        self.migakuContact.setStyleSheet("QGroupBox { font-weight: bold; } ")
+        self.migakuContactText = QtWidgets.QLabel("If you would like to report a bug or contribute to the add-on, the best way to do so is by starting a ticket or pull request on GitHub. If you are looking for personal assistance using the add-on, check out the Migaku Patreon Discord Server.")
+        self.migakuContactText.setWordWrap(True)
 
         self.gitHubIcon = self.getSVGWidget('Github.svg')
         self.gitHubIcon.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         
-        self.miaThanks = QtWidgets.QGroupBox()
-        self.miaThanks.setTitle('A Word of Thanks')
-        self.miaThanksVL = QtWidgets.QVBoxLayout()
-        self.miaThanks.setStyleSheet("QGroupBox { font-weight: bold; } ")
-        self.miaThanksText = QtWidgets.QLabel("We would not have been able to develop this add-on without the support our  <a href='https://www.patreon.com/join/massimmersionapproach?'>patrons</a>. Special thanks to Harrison D, Rafael C, Isaac, Jean-Felix M, Shaquille G, Zdennis, Tj B, Daniel L, Grinners, Garrett H, Mirzhan I, Matt S, Abdulrazzaq A, Darwish, Stian F, Aaron G, Stephen K, Keith W, Jermal, Jacob R, Renfred H, Luvoir, David L, David J, Stein E, Eric J M, and everyone else who supports MIA on Patreon!")
-        self.miaThanksText.setOpenExternalLinks(True);
-        self.miaThanksText.setWordWrap(True);
-        self.miaThanksVL.addWidget(self.miaThanksText)
+        self.migakuThanks = QtWidgets.QGroupBox()
+        self.migakuThanks.setTitle('A Word of Thanks')
+        self.migakuThanksVL = QtWidgets.QVBoxLayout()
+        self.migakuThanks.setStyleSheet("QGroupBox { font-weight: bold; } ")
+        self.migakuThanksText = QtWidgets.QLabel("Thanks so much to all Migaku supporters! I would not have been able to develop this add-on or any other Migaku project without your support!")
+        self.migakuThanksText.setOpenExternalLinks(True);
+        self.migakuThanksText.setWordWrap(True);
+        self.migakuThanksVL.addWidget(self.migakuThanksText)
 
-        self.miaContactVL.addWidget(self.miaContactText)
-        self.miaContactVL.addWidget(self.gitHubIcon)
-        self.miaContact.setLayout(self.miaContactVL)
-        self.miaThanks.setLayout(self.miaThanksVL)
-        self.tab4vl.addWidget(self.miaAbout)
-        self.tab4vl.addWidget(self.miaContact)
-        self.tab4vl.addWidget(self.miaThanks)
+        self.migakuContactVL.addWidget(self.migakuContactText)
+        self.migakuContactVL.addWidget(self.gitHubIcon)
+        self.migakuContact.setLayout(self.migakuContactVL)
+        self.migakuThanks.setLayout(self.migakuThanksVL)
+        self.tab4vl.addWidget(self.migakuAbout)
+        self.tab4vl.addWidget(self.migakuContact)
+        self.tab4vl.addWidget(self.migakuThanks)
         self.tab4vl.addStretch()
         self.tab_4.setLayout(self.tab4vl)
         self.tabWidget.addTab(self.tab_4, "")
@@ -814,7 +786,7 @@ class Ui_Dialog(object):
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def getSVGWidget(self,  name):
-        widget = MIASVG(join(self.addon_path, 'icons', name))
+        widget = MigakuSVG(join(self.addon_path, 'icons', name))
         widget.setFixedSize(27,27)
         return widget
 
@@ -834,7 +806,7 @@ class Ui_Dialog(object):
         self.odakaSelect.setText(_translate("Dialog", "Select Color"))
         self.kifukuSelect.setText(_translate("Dialog", "Select Color"))
         self.activeActionButton.setText(_translate("Dialog", "Add"))
-        self.label_10.setText(_translate("Dialog", "Add MIA Japanese Note Type:"))
+        self.label_10.setText(_translate("Dialog", "Add Migaku Japanese Note Type:"))
         self.label_9.setText(_translate("Dialog", "Auto CSS & JS Generation:"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("Dialog", "Active Fields"))
         self.label_37.setText(_translate("Dialog", "Heiban"))
