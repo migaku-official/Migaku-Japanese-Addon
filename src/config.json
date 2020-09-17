@@ -19,7 +19,10 @@
     "ActiveFields": [
                         "coloredhover;all;Migaku Japanese;Sentence;Expression;front",
                         "coloredkanjireading;all;Migaku Japanese;Sentence;Expression;back",
-                        "coloredhover;all;Migaku Japanese;Sentence;Meaning;back"
+                        "coloredhover;all;Migaku Japanese;Sentence;Meaning;back",
+                        "coloredhover;all;MIA Japanese;Sentence;Expression;front",
+                        "coloredkanjireading;all;MIA Japanese;Sentence;Expression;back",
+                        "coloredhover;all;MIA Japanese;Sentence;Meaning;back"
                     ]
 
 }
