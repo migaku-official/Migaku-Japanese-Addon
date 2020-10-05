@@ -1,5 +1,14 @@
 # -*- coding: utf-8 -*-
 
+# This file is based on the Japanese Support add-on's reading.py, which can be
+# found at <https://github.com/ankitects/anki-addons>.
+#
+# Copyright: Ankitects Pty Ltd and contributors
+# License: GNU GPL, version 3 or later; http://www.gnu.org/copyleft/gpl.html
+#
+# Automatic reading generation with kakasi and mecab.
+#
+
 import sys, os, platform, re, subprocess, aqt.utils
 from anki.utils import stripHTML, isWin, isMac
 from anki.hooks import addHook
