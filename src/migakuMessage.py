@@ -9,8 +9,57 @@ import os
 from aqt import mw
 from os.path import dirname, join, basename, exists, join
 from anki.hooks import addHook
+import requests as req
+import re
+from aqt.utils import openLink
+
+
+def attemptOpenLink(cmd):
+    if cmd.startswith('openLink:'):
+        openLink(cmd[9:])
+
+
 
 addon_path = dirname(__file__)
+
+
+def getConfig():
+        return mw.addonManager.getConfig(__name__)
+
+def saveConfiguration(newConf):
+    mw.addonManager.writeConfig(__name__, newConf)
+
+def getLatestVideos(config):
+    try:
+        resp = req.get("https://www.youtube.com/c/ImmerseWithYoga/videos")
+        pattern = "\{\"videoId\"\:\"(.*?)\""
+        matches = re.findall(pattern ,resp.text)
+        videoIds = list(dict.fromkeys(matches))
+        lastId = config["lastId"]
+        if videoIds[0] == lastId:
+            print("FAILED")
+            return False, False
+        
+        videoEmbeds = []
+        count = 0
+        for vid in videoIds:
+            if count > 6:
+                break
+            count+=1
+            if (count == 1):
+                videoEmbeds.append("<h2>A New Video Has Been Released!</h2>")
+                videoEmbeds.append('<div class="iframe-wrapper"><div class="clickable-video-link" data-vid="'+ vid + '"></div><iframe width="640" height="360" src="https://www.youtube.com/embed/'+ vid + '" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>')
+            else:
+                if (count == 2):
+                    videoEmbeds.append("<h2>Previous Videos:</h2>")
+                videoEmbeds.append('<div class="iframe-wrapper" style="display:inline-block"><div class="clickable-video-link" data-vid="'+ vid + '"></div><iframe width="320" height="180" src="https://www.youtube.com/embed/'+ vid + '" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>')
+        return "".join(videoEmbeds), videoIds[0]
+    except:
+        return False, False
+    
+    
+
+
 
 def miMessage(text, parent=False):
     title = "Migaku"
@@ -20,9 +69,10 @@ def miMessage(text, parent=False):
     mb = QMessageBox(parent)
     mb.setWindowIcon(icon)
     mb.setWindowTitle(title)
-    cb = QCheckBox("Don't show me this again.")
+    cb = QCheckBox("Don't show me the notice about this video again.")
     wv = AnkiWebView()
-    wv.setFixedSize(700, 700)
+    wv._page._bridge.onCmd = attemptOpenLink
+    wv.setFixedSize(680, 450)
     wv.page().setHtml(text)
     wide = QWidget()
     wide.setFixedSize(18,18)
@@ -43,12 +93,17 @@ def miMessage(text, parent=False):
 
 migakuMessage = '''
 <style>
+    body{
+    margin:0px;
+    padding:0px;
+    background-color: white !important;
+    }
     h3 {
-        margin-top:15px;
+        margin-top:5px;
         margin-left:15px;
         font-weight: 600;
         font-family: NeueHaas, input mono, sans-serif;
-        color: #1e1e1e;
+        color: #404040;
     }
     div {
         margin-left:15px;
@@ -63,57 +118,79 @@ migakuMessage = '''
         font-size:13;
         font-family: Helmet,Freesans,Helvetica,Arial,sans-serif;
     }
-    iframe{
-        margin-left:15px;
+
+    .iframe-wrapper{
+        position:relative;
+        margin-left:0px;
+        line-height: 1;
+    }
+
+    .clickable-video-link{
+        position:absolute;
+        v-index:10;
+        width:100%%;
+        top:0px;
+        left;0px;
+        height:20%%;
+        margin-left:0px;
+        line-height: 1;
+        cursor:pointer;
+
     }
 </style>
-<h3>The MIA Add-On Series Is Now the Migaku Add-On Series!</h3>
-<span>A message from Lucas (Yoga)<br><br></span>
-<div style="">
-    If you would like to know more about why this change in branding is happening.<br />
-    Please watch the video!<br />
-    Watch the video in your browser by clicking this link:<br />
-    <a href="https://youtu.be/ztk54w8Bems">https://youtu.be/ztk54w8Bems</a>
+<body>
+<h3><b>Thanks so much for using the Migaku Add-on series!</b></h3>
+<div class="center-div">
+    If you would like to ensure you don't miss any Migaku updates, or new releases.<br>
+    Please consider following us on <a href="https://www.youtube.com/c/ImmerseWithYoga">YouTube</a> and <a href="https://twitter.com/Migaku_Yoga">Twitter</a>!
+    <br>And please consider supporting Migaku on <a href="https://www.patreon.com/Migaku">Patreon</a> if you have found value in our work!
 </div>
-<br>
-<h3>The Truth About Matt vs. Japan and Why I’m Leaving MIA</h3>
-<iframe width="640" height="360" src="https://www.youtube.com/embed/ztk54w8Bems" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<div>
+%s
 </div>
 <script>
-    window.addEventListener("load", function () {
-        var outsidelinks = document.getElementsByClassName("outsideLink");
-        for (var i = 0; i < outsidelinks.length; i++) {
-            outsidelinks[i].addEventListener("click", function (e) {
-                pycmd("openLink:" + this.href);
+
+        const vids = document.getElementsByClassName("clickable-video-link");
+        for (var i = 0; i < vids.length; i++) {
+            vids[i].addEventListener("click", function (e) {
+                const vidId = e.target.dataset.vid;
+                pycmd("openLink:https://www.youtube.com/watch?v=" + vidId);
             });
         }
-    });
+
 </script>
+</body>
 '''
 
-def migakuMessageNeverShown():
-    filePath = join(addon_path, "migakuMessageShown.txt")
-    if not os.path.exists(filePath):
-        return True
-    return False
-
-def createMigakuAlreadyShownFile():
-    filePath = join(addon_path, "migakuMessageShown.txt")
-    with open(filePath, "w") as file:
-        file.write("Message Already Shown") 
-
 def attemptShowMigakuBrandUpdateMessage():
-    
+    config = getConfig()
+    shouldShow = config["displayAgain"]
     filePath = join(addon_path, "migakuMessageShown.txt")
-    if not hasattr(mw, 'MigakuBrandUpdateMessage'):
-        if migakuMessageNeverShown():
-            mw.MigakuBrandUpdateMessage = True
-            if miMessage(migakuMessage):
-                createMigakuAlreadyShownFile()
+    if not hasattr(mw, "MigakuMessageContent"):
+        mw.MigakuMessageContent = getLatestVideos(config)
+    videoIds,videoId = mw.MigakuMessageContent
+    if not hasattr(mw, "MigakuShouldNotShowMessage"):
+        if videoIds:
+            config["displayAgain"] = True
+            saveConfiguration(config)
+            if miMessage(migakuMessage%videoIds):
+                config["lastId"] = videoId
+                config["displayAgain"] = False
+                saveConfiguration(config)
+        elif shouldShow:
+            if miMessage(migakuMessage%""):
+                    config["displayAgain"] = False
+                    saveConfiguration(config)
+        mw.MigakuShouldNotShowMessage = True
     else:
-        if migakuMessageNeverShown():
-            createMigakuAlreadyShownFile()
-            
+        if videoId:
+            config["lastId"] = videoId
+        config["displayAgain"] = False
+        saveConfiguration(config)
+        
 
-
+     
 addHook("profileLoaded", attemptShowMigakuBrandUpdateMessage)
+
+
+

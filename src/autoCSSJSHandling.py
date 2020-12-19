@@ -290,9 +290,9 @@ class AutoCSSJSHandler:
         if displayTypeError != '':
             miInfo('The following entries have an incorrect display type. Valid display types are "Hover", "ColoredHover", "Kanji", "ColoredKanji", "KanjiReading", "ColoredKanjiReading", "Reading", and "ColoredReading".\n' + syntaxErrors, level="err")  
             return (wrapperDict, False);
-        if notFoundErrors != '':
-            miInfo('The following entries have incorrect values that are not found in your currently loaded Anki profile. Please note that this is not necessarily an error, if these fields or note types may exist within your other Anki profiles.\n\n' + notFoundErrors, level="wrn")
-            return (wrapperDict, False);
+        # if notFoundErrors != '':
+        #     miInfo('The following entries have incorrect values that are not found in your currently loaded Anki profile. Please note that this is not necessarily an error, if these fields or note types may exist within your other Anki profiles.\n\n' + notFoundErrors, level="wrn")
+        #     return (wrapperDict, False);
         if fieldConflictErrors != '':
             miInfo('You have entries that point to the same field and the same side. Please make sure that a field and side combination does not conflict.\n\n' + fieldConflictErrors, level="err")
             return (wrapperDict, False);

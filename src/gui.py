@@ -22,6 +22,8 @@ from operator import itemgetter
 addon_path = dirname(__file__)
 import platform
 
+verNumber = "1.1.1"
+
 class JSGui(QScrollArea):
     def __init__(self, mw, colArray, MigakuModel, reboot, CSSJSHandler, UEManager):
         super(JSGui, self).__init__()
@@ -72,7 +74,7 @@ class JSGui(QScrollArea):
 
     def setInitialValues(self):
         self.setWindowIcon(QIcon(join(addon_path, 'icons', 'migaku.png')))
-        self.setWindowTitle("Migaku Japanese Settings")
+        self.setWindowTitle("Migaku Japanese Settings (Ver. " + verNumber + ")")
         self.cont.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         self.cont.setFixedSize(1167, 725)
         self.setWidget(self.cont)
