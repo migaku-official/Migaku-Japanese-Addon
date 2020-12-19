@@ -220,11 +220,21 @@ class Ui_Dialog(object):
 
         self.label_41 = QtWidgets.QLabel(self.groupBox_5)
         self.label_41.setObjectName("label_41")
-        self.gridLayout_21.addWidget(self.label_41, 3, 4, 1, 1)
+        self.gridLayout_21.addWidget(self.label_41, 3, 0, 1, 1)
         self.katakanaConversion = QtWidgets.QCheckBox(self.groupBox_5)
         self.katakanaConversion.setText("")
         self.katakanaConversion.setObjectName("katakanaConversion")
-        self.gridLayout_21.addWidget(self.katakanaConversion, 3, 5, 1, 1)
+        self.gridLayout_21.addWidget(self.katakanaConversion, 3, 1, 1, 1)
+
+        self.labelLegacy = QtWidgets.QLabel(self.groupBox_5)
+        self.labelLegacy.setText("Remove Legacy JS & CSS")
+        self.labelLegacy.setObjectName("labelLegacy")
+        self.gridLayout_21.addWidget(self.labelLegacy, 3, 2, 1, 1)
+        self.removeLegacy = QtWidgets.QCheckBox(self.groupBox_5)
+        self.removeLegacy.setText("")
+        self.removeLegacy.setObjectName("removeLegacy")
+        self.gridLayout_21.addWidget(self.removeLegacy, 3, 3, 1, 1)
+
         self.gridLayout_2.addWidget(self.groupBox_5, 11, 0, 1, 2)
         self.groupBox = QtWidgets.QGroupBox(self.tab_2)
         self.groupBox.setTitle("")

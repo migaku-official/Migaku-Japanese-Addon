@@ -159,7 +159,7 @@ def loadAllProfileInformation():
         try:
             tempCol = Collection(cpath)
             noteTypes = tempCol.models.all()
-            tempCol.db.close()
+            tempCol.close()
             tempCol = None
             noteTypeDict = {}
             for note in noteTypes:
@@ -170,7 +170,7 @@ def loadAllProfileInformation():
                     noteTypeDict[note['name']]["fields"].append(f['name'])
             colArray[prof] = noteTypeDict
         except:
-            miInfo('<b>Warning:</b><br>Your Anki collection could not be loaded, as a result the Migaku Japanese Add-on settings menu will not work correctly. This problem typically occurs when creating a new Anki profile. You can <b>fix this issue by simply restarting Anki after loading your new profile for the first time.<b>', level='wrn')
+            miInfo('<b>Warning:</b><br>One of your profiles could not be loaded. This usually happens if you\'ve just created a new profile and are opening it for the first time.The issue should be fixed after restarting Anki.If it persists, then your profile is corrupted in some way.\n\nYou can fix this corruption by exporting your collection, importing it into a new profile, and then deleting your previous profile. <b>', level='wrn')
 
 def openGui():
     if not mw.MigakuJSSettings:
@@ -269,32 +269,15 @@ aqt.addons.ConfigEditor.accept = supportAccept
 
 def customFind(self, query, order=False):
     if 'nobr' in query:
-        query = query.replace('nobr', '').replace('\n', '').replace('\r', '')
-        tokens = self._tokenize(query)
-        preds, args = self._where(tokens)
-        if preds is None:
-           raise Exception("invalidSearch")
-        order, rev = self._order(order)
-        sql = self._query(preds, order)
-        for idx, val in enumerate(args):
-            newArg = '%'
-            val = val.replace('%','')
-            for char in val:
-                newArg += char +'%'
-            args[idx] = newArg
-        try:
-            res = self.col.db.list(sql, *args)
-        except:
-            # invalid grouping
-            return []
-        if rev:
-            res.reverse()
-        return res 
-    else:
-        return ogFind(self, query, order)
+        query = query.replace('nobr', '').replace('\n', '').replace('\r', '').strip()
+        newquery = []
+        for char in query:
+            newquery.append(char)
+        query = '*'.join(newquery)
+    return ogFind(self, query, order)
 
-ogFind = Finder.findCards
-Finder.findCards = customFind
+ogFind = Collection.find_cards
+Collection.find_cards = customFind
 
 def getFieldName(fieldId, note):
     fields = mw.col.models.fieldNames(note.model())

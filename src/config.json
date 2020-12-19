@@ -1,30 +1,29 @@
-{   
-    "Profiles" : ["all"],
-    "AddMigakuJapaneseTemplate": "on",
-    "LookAhead" :  25,
-    "FuriganaFontSize" :  4,
-    "BufferedOutput" : "off",
-    "AutoCssJsGeneration" : "on",
-    "DisplayShapes" : "on",
-    "GraphOnHoverBack" : "on",
-    "GraphOnHover" : "on",
-    "HistoricalConversion" : "off",
-    "KatakanaConversion" : "off",
-    "Group:Kana;DictForm;Pitch;Audio;Graphs": "on;on;on;off;off",
-    "Individual:Kana;DictForm;Pitch;Audio;Graphs": "off;off;off;on;on",
-    "ColorsHANOK" : ["#005CE6", "#E60000", "#E68A00", "#00802B","#AC00E6"],
-    "PitchGraphFields" : "Audio;overwrite",
-    "AudioFields" : "Audio;overwrite",
-    "PlayAudioOnClick" : "on",
-    "ActiveFields": [
-                        "coloredhover;all;Migaku Japanese;Sentence;Expression;front",
-                        "coloredkanjireading;all;Migaku Japanese;Sentence;Expression;back",
-                        "coloredhover;all;Migaku Japanese;Sentence;Meaning;back",
-                        "coloredhover;all;MIA Japanese;Sentence;Expression;front",
-                        "coloredkanjireading;all;MIA Japanese;Sentence;Expression;back",
-                        "coloredhover;all;MIA Japanese;Sentence;Meaning;back"
-                    ],
-    "lastId": false, 
-    "displayAgain": true
-
+{
+  "Profiles": ["all"],
+  "AddMigakuJapaneseTemplate": "on",
+  "LookAhead": 25,
+  "FuriganaFontSize": 4,
+  "BufferedOutput": "off",
+  "AutoCssJsGeneration": "on",
+  "DisplayShapes": "on",
+  "GraphOnHoverBack": "on",
+  "GraphOnHover": "on",
+  "HistoricalConversion": "off",
+  "KatakanaConversion": "off",
+  "Group:Kana;DictForm;Pitch;Audio;Graphs": "on;on;on;off;off",
+  "Individual:Kana;DictForm;Pitch;Audio;Graphs": "off;off;off;on;on",
+  "ColorsHANOK": ["#005CE6", "#E60000", "#E68A00", "#00802B", "#AC00E6"],
+  "PitchGraphFields": "Audio;overwrite",
+  "AudioFields": "Audio;overwrite",
+  "PlayAudioOnClick": "on",
+  "ActiveFields": [
+    "coloredhover;all;Migaku Japanese;Sentence;Expression;front",
+    "coloredkanjireading;all;Migaku Japanese;Sentence;Expression;back",
+    "coloredhover;all;Migaku Japanese;Sentence;Meaning;back",
+    "coloredhover;all;MIA Japanese;Sentence;Expression;front",
+    "coloredkanjireading;all;MIA Japanese;Sentence;Expression;back",
+    "coloredhover;all;MIA Japanese;Sentence;Meaning;back"
+  ],
+  "lastId": false,
+  "displayAgain": true
 }

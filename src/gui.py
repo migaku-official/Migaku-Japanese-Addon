@@ -22,7 +22,7 @@ from operator import itemgetter
 addon_path = dirname(__file__)
 import platform
 
-verNumber = "1.1.1"
+verNumber = "1.2.0"
 
 class JSGui(QScrollArea):
     def __init__(self, mw, colArray, MigakuModel, reboot, CSSJSHandler, UEManager):
@@ -604,7 +604,8 @@ class JSGui(QScrollArea):
         if self.addMigakuNoteTypeOnApply:
             self.MigakuModel.addModels() 
         self.mw.addonManager.writeConfig(__name__, newConf)
-        self.CSSJSHandler.injectWrapperElements()
+        removeLegacy = self.ui.removeLegacy.isChecked()
+        self.CSSJSHandler.injectWrapperElements(removeLegacy = removeLegacy)
         self.hide()
 
 
@@ -972,6 +973,7 @@ class JSGui(QScrollArea):
         self.ui.runRulesButton.setToolTip('Applies all overwrite rules to your collection. Rules are only applied to fields \nthat have been designated an "active field" in the active fields tab.')
         self.ui.importRules.setToolTip('Import an overwrite rules list. Options to overwrite or ignore duplicates, and to \noverwrite the current rules list with the newly imported list.')
         self.ui.exportRules.setToolTip('Export your current overwrite rules list.')
+        self.ui.removeLegacy.setToolTip('When this box is checked-off and the "Apply" button is clicked,\nthen all legacy MIA JS & CSS will be removed from all your card types.')
         
 
     def loadAllProfiles(self):

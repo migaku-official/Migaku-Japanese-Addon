@@ -19,8 +19,19 @@ class AutoCSSJSHandler:
         self.jJSFooter = '<!--###MIGAKU JAPANESE SUPPORT JS ENDS###-->' 
         self.jKHeader = '<!--###MIGAKU JAPANESE SUPPORT KATAKANA CONVERTER JS START###\nDo Not Edit If Using Automatic CSS and JS Management-->'
         self.jKFooter = '<!--###MIGAKU JAPANESE SUPPORT KATAKANA CONVERTER JS ENDS###-->'
+        self.jCssHeaderLegacy = '/*###MIA JAPANESE SUPPORT CSS STARTS###\nDo Not Edit If Using Automatic CSS and JS Management*/'
+        self.jCssFooterLegacy = '/*###MIA JAPANESE SUPPORT CSS ENDS###*/'
+        self.jCssHeaderPLegacy = '\/\*###MIA JAPANESE SUPPORT CSS STARTS###\nDo Not Edit If Using Automatic CSS and JS Management\*\/'
+        self.jCssFooterPLegacy = '\/\*###MIA JAPANESE SUPPORT CSS ENDS###\*\/'
+        self.jHistHeaderLegacy = '<!--###MIA JAPANESE SUPPORT CONVERTER JS START###\nDo Not Edit If Using Automatic CSS and JS Management-->'
+        self.jHistFooterLegacy = '<!--###MIA JAPANESE SUPPORT CONVERTER JS ENDS###-->'
+        self.jJSHeaderLegacy = '<!--###MIA JAPANESE SUPPORT JS START###\nDo Not Edit If Using Automatic CSS and JS Management-->'
+        self.jJSFooterLegacy = '<!--###MIA JAPANESE SUPPORT JS ENDS###-->' 
+        self.jKHeaderLegacy = '<!--###MIA JAPANESE SUPPORT KATAKANA CONVERTER JS START###\nDo Not Edit If Using Automatic CSS and JS Management-->'
+        self.jKFooterLegacy = '<!--###MIA JAPANESE SUPPORT KATAKANA CONVERTER JS ENDS###-->'
         self.formatJapaneseJS = self.getFormatJapaneseJS()
         self.jFormattingFunctionsJS = self.getJFormattingFunctions()
+        self.removeLegacy = False
 
     def getFormatJapaneseJS(self):
         formatJapanese = join(self.addon_path, "js", "formatJapanese.js")
@@ -41,10 +52,11 @@ class AutoCSSJSHandler:
             return True
         return False     
 
-    def injectWrapperElements(self):
+    def injectWrapperElements(self, removeLegacy = False):
         if not self.checkProfile():
             return
         config = self.getConfig()
+        self.removeLegacy = removeLegacy
         if config["AutoCssJsGeneration"].lower() != 'on':
             return
         variantCheck = self.checkVariantSyntax()
@@ -77,8 +89,7 @@ class AutoCSSJSHandler:
                     t = self.removeKanaOldJsFromTemplate(t)
                     t['qfmt'] = self.removeJapaneseJs(self.removeWrappers(t['qfmt']))
                     t['afmt'] = self.removeJapaneseJs(self.removeWrappers(t['afmt']))   
-        self.mw.col.models.save()
-        self.mw.col.models.flush()
+            self.mw.col.models.save(model)
         return variantCheck and wrapperCheck 
 
 
@@ -180,11 +191,14 @@ class AutoCSSJSHandler:
         js = self.jKHeader + '<script>' + KataverterJS + '</script>' + self.jKFooter;
         return js
 
-
     def removeConverterJs(self, text):
+        if self.removeLegacy:
+            text = re.sub(self.jHistHeaderLegacy + r'.*?' + self.jHistFooterLegacy, '', text)
         return re.sub(self.jHistHeader + r'.*?' + self.jHistFooter, '', text)
 
     def removeKataverterJs(self, text):
+        if self.removeLegacy:
+            text = re.sub(self.jKHeaderLegacy + r'.*?' + self.jKFooterLegacy, '', text)
         return re.sub(self.jKHeader + r'.*?' + self.jKFooter, '', text)
 
     def getHistoricalConverterJs(self, conversionType, katakana):    
@@ -290,7 +304,7 @@ class AutoCSSJSHandler:
         if displayTypeError != '':
             miInfo('The following entries have an incorrect display type. Valid display types are "Hover", "ColoredHover", "Kanji", "ColoredKanji", "KanjiReading", "ColoredKanjiReading", "Reading", and "ColoredReading".\n' + syntaxErrors, level="err")  
             return (wrapperDict, False);
-        # if notFoundErrors != '':
+        # if notFoundErrors != '': 
         #     miInfo('The following entries have incorrect values that are not found in your currently loaded Anki profile. Please note that this is not necessarily an error, if these fields or note types may exist within your other Anki profiles.\n\n' + notFoundErrors, level="wrn")
         #     return (wrapperDict, False);
         if fieldConflictErrors != '':
@@ -435,6 +449,8 @@ class AutoCSSJSHandler:
         return
 
     def removeJapaneseJs(self, text):
+        if self.removeLegacy:
+            text = re.sub(self.jJSHeaderLegacy + r'.*?' + self.jJSFooterLegacy, '', text)
         return re.sub(self.jJSHeader + r'.*?' + self.jJSFooter, '', text)
 
     def fieldInTemplateDict(self, field, templateDict):
@@ -445,6 +461,8 @@ class AutoCSSJSHandler:
         return sides   
 
     def removeJapaneseCss(self, css):
+        if self.removeLegacy:
+            css = re.sub(self.jCssHeaderPLegacy + r'\n.*\n' + self.jCssFooterPLegacy, '', css)
         return re.sub(self.jCssHeaderP + r'\n.*\n' + self.jCssFooterP, '', css)
 
     def overwriteWrapperElement(self, text, field, dType):
