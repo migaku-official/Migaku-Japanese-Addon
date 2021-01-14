@@ -31,14 +31,10 @@ def saveConfiguration(newConf):
 
 def getLatestVideos(config):
     try:
-        resp = req.get("https://www.youtube.com/c/ImmerseWithYoga/videos")
+        resp = req.get("https://www.youtube.com/channel/UCQFe3x4WAgm7joN5daMm5Ew/videos")
         pattern = "\{\"videoId\"\:\"(.*?)\""
         matches = re.findall(pattern ,resp.text)
         videoIds = list(dict.fromkeys(matches))
-        lastId = config["lastId"]
-        if videoIds[0] == lastId:
-            print("FAILED")
-            return False, False
         
         videoEmbeds = []
         count = 0
@@ -47,7 +43,7 @@ def getLatestVideos(config):
                 break
             count+=1
             if (count == 1):
-                videoEmbeds.append("<h2>A New Video Has Been Released!</h2>")
+                videoEmbeds.append("<h2>Check Out Our Latest Release:</h2>")
                 videoEmbeds.append('<div class="iframe-wrapper"><div class="clickable-video-link" data-vid="'+ vid + '"></div><iframe width="640" height="360" src="https://www.youtube.com/embed/'+ vid + '" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>')
             else:
                 if (count == 2):
@@ -69,7 +65,7 @@ def miMessage(text, parent=False):
     mb = QMessageBox(parent)
     mb.setWindowIcon(icon)
     mb.setWindowTitle(title)
-    cb = QCheckBox("Don't show me the notice about this video again.")
+    cb = QCheckBox("Don't show me the welcome screen again.")
     wv = AnkiWebView()
     wv._page._bridge.onCmd = attemptOpenLink
     wv.setFixedSize(680, 450)
@@ -142,8 +138,8 @@ migakuMessage = '''
 <h3><b>Thanks so much for using the Migaku Add-on series!</b></h3>
 <div class="center-div">
     If you would like to ensure you don't miss any Migaku updates, or new releases.<br>
-    Please consider following us on <a href="https://www.youtube.com/c/ImmerseWithYoga">YouTube</a> and <a href="https://twitter.com/Migaku_Yoga">Twitter</a>!
-    <br>And please consider supporting Migaku on <a href="https://www.patreon.com/Migaku">Patreon</a> if you have found value in our work!
+    Please consider visiting our <a href="https://migaku.io">website</a>, and following us on <a href="https://www.youtube.com/channel/UCQFe3x4WAgm7joN5daMm5Ew">YouTube</a> and <a href="https://twitter.com/Migaku_Yoga">Twitter</a>!
+    <br>Also, please consider supporting Migaku on <a href="https://www.patreon.com/Migaku">Patreon</a> if you have found value in our work!
 </div>
 <div>
 %s
@@ -162,34 +158,30 @@ migakuMessage = '''
 </body>
 '''
 
+def disableMessage(config):
+    config["displayAgain"] = False
+    saveConfiguration(config)
+    mw.MigakuShouldNotShowMessage = True
+
+def displayMessageMaybeDisableMessage(content, config):
+    if miMessage(migakuMessage%content):
+        disableMessage(config)
+     
 def attemptShowMigakuBrandUpdateMessage():
     config = getConfig()
     shouldShow = config["displayAgain"]
-    filePath = join(addon_path, "migakuMessageShown.txt")
-    if not hasattr(mw, "MigakuMessageContent"):
-        mw.MigakuMessageContent = getLatestVideos(config)
-    videoIds,videoId = mw.MigakuMessageContent
-    if not hasattr(mw, "MigakuShouldNotShowMessage"):
+    if shouldShow and not hasattr(mw, "MigakuShouldNotShowMessage"):
+        videoIds,videoId = getLatestVideos(config)
         if videoIds:
-            config["displayAgain"] = True
-            saveConfiguration(config)
-            if miMessage(migakuMessage%videoIds):
-                config["lastId"] = videoId
-                config["displayAgain"] = False
-                saveConfiguration(config)
-        elif shouldShow:
-            if miMessage(migakuMessage%""):
-                    config["displayAgain"] = False
-                    saveConfiguration(config)
-        mw.MigakuShouldNotShowMessage = True
+            displayMessageMaybeDisableMessage(videoIds, config)
+        else:
+            displayMessageMaybeDisableMessage("", config)
+    elif shouldShow and hasattr(mw, "MigakuShouldNotShowMessage"):
+        disableMessage(config)
     else:
-        if videoId:
-            config["lastId"] = videoId
-        config["displayAgain"] = False
-        saveConfiguration(config)
-        
+        mw.MigakuShouldNotShowMessage = True
 
-     
+
 addHook("profileLoaded", attemptShowMigakuBrandUpdateMessage)
 
 

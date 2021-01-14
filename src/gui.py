@@ -283,8 +283,9 @@ class JSGui(QScrollArea):
         self.ui.searchRulesLE.returnPressed.connect(self.initRuleSearch)
         self.ui.searchRulesButton.clicked.connect(self.initRuleSearch)
 
+        self.ui.migakuInfoSite.clicked.connect(lambda: openLink('https://migaku.io'))
         self.ui.migakuPatreonIcon.clicked.connect(lambda: openLink('https://www.patreon.com/Migaku'))
-        self.ui.migakuInfoYT.clicked.connect(lambda: openLink('https://www.youtube.com/c/ImmerseWithYoga'))
+        self.ui.migakuInfoYT.clicked.connect(lambda: openLink('https://www.youtube.com/channel/UCQFe3x4WAgm7joN5daMm5Ew'))
         self.ui.migakuInfoTW.clicked.connect(lambda: openLink('https://twitter.com/Migaku_Yoga'))
         self.ui.gitHubIcon.clicked.connect(lambda: openLink('https://github.com/migaku-official/Migaku-Japanese-Addon'))
 

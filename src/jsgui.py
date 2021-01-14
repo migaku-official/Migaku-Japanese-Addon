@@ -5,6 +5,7 @@ from aqt.utils import showInfo
 from os.path import dirname, join
 from anki.utils import isMac, isWin, isLin
 import platform
+from aqt.theme import theme_manager
 
 class MigakuLabel(QtWidgets.QLabel):
     clicked=QtCore.pyqtSignal()
@@ -544,7 +545,7 @@ class Ui_Dialog(object):
         self.addMigakuNoteType.setObjectName("addMigakuNoteType")
         self.gridLayout.addWidget(self.addMigakuNoteType, 0, 3, 1, 1)
         self.listWidget = QtWidgets.QTableWidget(self.tab)
-        if isWin and platform.release() == '10':
+        if isWin and platform.release() == '10' and theme_manager.night_mode != True:
             self.listWidget.setStyleSheet(
         "QHeaderView::section{"
             "border-top:0px solid #D8D8D8;"
@@ -613,7 +614,7 @@ class Ui_Dialog(object):
         self.horizontalLayout_3.addWidget(self.searchRulesButton, 0, QtCore.Qt.AlignLeft)
         self.verticalLayout.addLayout(self.horizontalLayout_3)
         self.rulesTable = QtWidgets.QTableView(self.tab_3)
-        if isWin and platform.release() == '10':
+        if isWin and platform.release() == '10' and theme_manager.night_mode != True:
             self.rulesTable.setStyleSheet(
         "QHeaderView::section{"
             "border-top:0px solid #D8D8D8;"
@@ -737,12 +738,16 @@ class Ui_Dialog(object):
 
         self.migakuInfo = QtWidgets.QLabel("Migaku:")
         self.migakuInfoYT = self.getSVGWidget('Youtube.svg')
+        self.migakuInfoSite = self.getSVGWidget('migaku.svg')
+        self.migakuInfoSite.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+
         self.migakuInfoYT.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
 
         self.migakuInfoTW = self.getSVGWidget('Twitter.svg')
         self.migakuInfoTW.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
 
         self.migakuAboutLinksHL3.addWidget(self.migakuInfo)
+        self.migakuAboutLinksHL3.addWidget(self.migakuInfoSite)
         self.migakuAboutLinksHL3.addWidget(self.migakuInfoYT)
         self.migakuAboutLinksHL3.addWidget(self.migakuInfoTW)
         self.migakuAboutLinksHL3.addWidget(self.migakuPatreonIcon)
@@ -767,7 +772,7 @@ class Ui_Dialog(object):
         self.migakuThanks.setTitle('A Word of Thanks')
         self.migakuThanksVL = QtWidgets.QVBoxLayout()
         self.migakuThanks.setStyleSheet("QGroupBox { font-weight: bold; } ")
-        self.migakuThanksText = QtWidgets.QLabel("Thanks so much to all Migaku supporters! I would not have been able to develop this add-on or any other Migaku project without your support!")
+        self.migakuThanksText = QtWidgets.QLabel("Thanks so much to all Migaku supporters! We would not have been able to develop this add-on or any other Migaku project without your support!")
         self.migakuThanksText.setOpenExternalLinks(True);
         self.migakuThanksText.setWordWrap(True);
         self.migakuThanksVL.addWidget(self.migakuThanksText)
