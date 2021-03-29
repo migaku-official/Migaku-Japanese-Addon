@@ -108,15 +108,14 @@ src: url(_yumin.ttf);
 }
 
 .migaku-card-image img {
-  height: 250px;
   width: 90vw;
   max-width: 600px;
-  object-fit: cover;
   border-top-right-radius: 10px;
   border-top-left-radius: 10px;
+  height: auto;
+  max-height: 350px;
+  object-fit: contain;
 }
-
-
 
 .migaku-sentence,
 .migaku-translation,
