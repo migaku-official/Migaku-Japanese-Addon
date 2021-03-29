@@ -10,6 +10,25 @@ from shutil import copyfile
 
 class MILanguageModels():
     def __init__(self, mw):
+        self.activeFields = [
+          "coloredhover;all;Migaku Japanese Sentence;Standard;Sentence;front",
+          "coloredkanjireading;all;Migaku Japanese Sentence;Standard;Sentence;back",
+          "coloredkanjireading;all;Migaku Japanese Sentence;Standard;Target Word;back",
+          "coloredkanjireading;all;Migaku Japanese Sentence;Standard;Definitions;back",
+
+          "coloredhover;all;Migaku Japanese Vocabulary;Standard;Target Word;front",
+          "coloredkanjireading;all;Migaku Japanese Vocabulary;Standard;Target Word;back",
+          "coloredkanjireading;all;Migaku Japanese Vocabulary;Standard;Definitions;back",
+          "coloredkanjireading;all;Migaku Japanese Vocabulary;Standard;Sentence;back",
+
+          "coloredkanjireading;all;Migaku Japanese Audio Vocabulary;Standard;Target Word;back",
+          "coloredkanjireading;all;Migaku Japanese Audio Vocabulary;Standard;Definitions;back",
+          "coloredkanjireading;all;Migaku Japanese Audio Vocabulary;Standard;Sentence;back",
+
+          "coloredkanjireading;all;Migaku Japanese Audio Sentence;Standard;Target Word;back",
+          "coloredkanjireading;all;Migaku Japanese Audio Sentence;Standard;Definitions;back",
+          "coloredkanjireading;all;Migaku Japanese Audio Sentence;Standard;Sentence;back"
+        ]
         self.svg = '''
    <svg class="migaku-logo" width="30" height="39" viewBox="0 0 30 39">
     <path
@@ -309,17 +328,23 @@ src: url(_yumin.ttf);
     def addModels(self):
         config = self.mw.addonManager.getConfig(__name__)
         if config:
-            add = False
-            if config.get('AddMigakuJapaneseTemplate', False) == "on":
-                add = True
             for model in self.modelList:
-                if add:
-                    self.addModel(model)
-            if add:
-                self.addExportTemplates()
-                self.moveFontToMediaDir('_yumin.ttf')
+                if not self.mw.col.models.byName(model[0]):
+                  if config.get('AddMigakuJapaneseTemplate', False) == "on":
+                      self.addModel(model)
+                      self.addExportTemplates()
+                      self.maybeAddActiveFieldsToConfig()
+                      self.moveFontToMediaDir('_yumin.ttf')
         
-
+    def maybeAddActiveFieldsToConfig(self, config):
+        activeFieldsConfig = config["ActiveFields"]
+        changed = False
+        for af in self.activeFields:
+            if af not in activeFieldsConfig:
+                activeFieldsConfig.append(af)
+                changed = True
+        if changed:
+            self.mw.addonManager.writeConfig(__name__, config)
 
     def addExportTemplates(self):
         addons = self.mw.addonManager.all_addon_meta()
@@ -412,18 +437,17 @@ src: url(_yumin.ttf);
         
 
     def addModel(self, model):
-        if not self.mw.col.models.byName(model[0]):
-            modelManager = self.mw.col.models
-            newModel = modelManager.new(model[0])
-            for fieldName in model[1]:
-                field = modelManager.newField(fieldName)
-                modelManager.addField(newModel, field)
-            template = modelManager.newTemplate('Standard')
-            template['qfmt'] = model[2]
-            template['afmt'] = model[3]
-            newModel['css'] = self.style
-            modelManager.addTemplate(newModel, template)
-            modelManager.add(newModel)
+        modelManager = self.mw.col.models
+        newModel = modelManager.new(model[0])
+        for fieldName in model[1]:
+            field = modelManager.newField(fieldName)
+            modelManager.addField(newModel, field)
+        template = modelManager.newTemplate('Standard')
+        template['qfmt'] = model[2]
+        template['afmt'] = model[3]
+        newModel['css'] = self.style
+        modelManager.addTemplate(newModel, template)
+        modelManager.add(newModel)
         
     def moveFontToMediaDir(self, filename):
         src = join(dirname(__file__), filename)
