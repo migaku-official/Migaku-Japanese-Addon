@@ -333,7 +333,7 @@ src: url(_yumin.ttf);
                   if config.get('AddMigakuJapaneseTemplate', False) == "on":
                       self.addModel(model)
                       self.addExportTemplates()
-                      self.maybeAddActiveFieldsToConfig()
+                      self.maybeAddActiveFieldsToConfig(config)
                       self.moveFontToMediaDir('_yumin.ttf')
         
     def maybeAddActiveFieldsToConfig(self, config):
