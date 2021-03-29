@@ -14,15 +14,35 @@
   "Individual:Kana;DictForm;Pitch;Audio;Graphs": "off;off;off;on;on",
   "ColorsHANOK": ["#005CE6", "#E60000", "#E68A00", "#00802B", "#AC00E6"],
   "PitchGraphFields": "Audio;overwrite",
-  "AudioFields": "Audio;overwrite",
+  "AudioFields": "Audio,Word Audio;overwrite",
   "PlayAudioOnClick": "on",
   "ActiveFields": [
     "coloredhover;all;Migaku Japanese;Sentence;Expression;front",
     "coloredkanjireading;all;Migaku Japanese;Sentence;Expression;back",
     "coloredhover;all;Migaku Japanese;Sentence;Meaning;back",
+
     "coloredhover;all;MIA Japanese;Sentence;Expression;front",
     "coloredkanjireading;all;MIA Japanese;Sentence;Expression;back",
-    "coloredhover;all;MIA Japanese;Sentence;Meaning;back"
+    "coloredhover;all;MIA Japanese;Sentence;Meaning;back",
+
+    "coloredhover;all;Migaku Japanese Sentence;Standard;Sentence;front",
+    "coloredkanjireading;all;Migaku Japanese Sentence;Standard;Sentence;back",
+    "coloredkanjireading;all;Migaku Japanese Sentence;Standard;Target Word;back",
+    "coloredkanjireading;all;Migaku Japanese Sentence;Standard;Definitions;back",
+
+    "coloredhover;all;Migaku Japanese Vocabulary;Standard;Target Word;front",
+    "coloredkanjireading;all;Migaku Japanese Vocabulary;Standard;Target Word;back",
+    "coloredkanjireading;all;Migaku Japanese Vocabulary;Standard;Definitions;back",
+    "coloredkanjireading;all;Migaku Japanese Vocabulary;Standard;Sentence;back",
+
+    "coloredkanjireading;all;Migaku Japanese Audio Vocabulary;Standard;Target Word;back",
+    "coloredkanjireading;all;Migaku Japanese Audio Vocabulary;Standard;Definitions;back",
+    "coloredkanjireading;all;Migaku Japanese Audio Vocabulary;Standard;Sentence;back",
+
+    "coloredkanjireading;all;Migaku Japanese Audio Sentence;Standard;Target Word;back",
+    "coloredkanjireading;all;Migaku Japanese Audio Sentence;Standard;Definitions;back",
+    "coloredkanjireading;all;Migaku Japanese Audio Sentence;Standard;Sentence;back"
+
   ],
   "displayAgain": true
 }

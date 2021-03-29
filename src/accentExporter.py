@@ -580,8 +580,6 @@ class AccentExporter:
 
     def finalizeGroupExport(self, editor, text, field, note):
         if note and field:
-            # if type(editor.parentWindow) is not AddCards:
-                # self.mw.checkpoint('Sentence Accent Generation')
             newText = text
             htmlFinds, text = self.htmlRemove(text)
             text, sounds = self.removeBrackets(text, True)
@@ -600,8 +598,7 @@ class AccentExporter:
                 editor.web.eval(self.commonJS + self.insertHTMLJS % newHTML.replace('"', '\\"'))
             if audioGraphList:
                 self.addVariants(audioGraphList, note, editor)      
-                # note.flush() 
-                # self.reloadEditor()
+
 
     def fetchParsedField(self, text, note):
             newText = text
@@ -818,7 +815,7 @@ class AccentExporter:
     def getConfig(self):
         return self.mw.addonManager.getConfig(__name__)
 
-    def addVariants(self, audioGraphs, note, editor = False): 
+    def addVariants(self, audioGraphs, note, editor = False, additionType = False ): 
         config = self.getConfig()
         audioCon = config['AudioFields'].split(';')
         graphCon = config['PitchGraphFields'].split(';')
@@ -833,13 +830,19 @@ class AccentExporter:
             gSep = graphCon[2]
         for aField in aFields:
             if self.dictParser.graphMode and aField in gFields and (aField in fields or aField.lower() == 'clipboard'):
-                text = self.writeAudioGraphsText(audioGraphs, note, aField, graphCon[1], gSep, 2, editor)
+                if not additionType:
+                    additionType = graphCon[1]
+                text = self.writeAudioGraphsText(audioGraphs, note, aField, additionType, gSep, 2, editor)
             else:
+                if not additionType:
+                    additionType = audioCon[1]
                 if aField in fields or aField.lower() == 'clipboard':
-                    text = self.writeAudioGraphsText(audioGraphs, note, aField, audioCon[1], aSep, 0, editor)
+                    text = self.writeAudioGraphsText(audioGraphs, note, aField, additionType, aSep, 0, editor)
         for gField in gFields:
             if (gField in fields or gField.lower() == 'clipboard') and gField not in aFields:
-                text = self.writeAudioGraphsText(audioGraphs, note, gField, graphCon[1], gSep, 1, editor)
+                if not additionType:
+                    additionType = graphCon[1]
+                text = self.writeAudioGraphsText(audioGraphs, note, gField, additionType, gSep, 1, editor)
 
     def getFieldOrdinal(self, note, field):
         fields = note._model["flds"]

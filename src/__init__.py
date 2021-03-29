@@ -12,8 +12,4 @@
 # The final release will also be organized into individual .py files by functionality.
 # Lucas - Migaku Founder
 
-from . import models
-from anki.hooks import addHook
-addHook("profileLoaded", models.addModels)
-
-from . import main, migakuMessage
+from . import main, migakuMessage, modelChanger

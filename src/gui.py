@@ -22,12 +22,13 @@ from operator import itemgetter
 addon_path = dirname(__file__)
 import platform
 
-verNumber = "1.2.1"
+verNumber = "1.2.3"
 
 class JSGui(QScrollArea):
-    def __init__(self, mw, colArray, MigakuModel, reboot, CSSJSHandler, UEManager):
+    def __init__(self, mw, colArray, languageModeler, reboot, CSSJSHandler, UEManager):
         super(JSGui, self).__init__()
         self.mw = mw 
+        self.modeler = languageModeler
         self.cA = self.updateCurrentProfileInfo(colArray)
         self.allFields = self.getAllFields()
         self.cont = QWidget()
@@ -58,7 +59,6 @@ class JSGui(QScrollArea):
             'kanjireading' : 'Kanji Reading', 'coloredkanjireading' : 'Colored Kanji Reading',
             'reading' : 'Reading', 'coloredreading' : 'Colored Reading'
             }
-        self.MigakuModel = MigakuModel
         self.selectedProfiles = []
         self.selectedAudioFields = []
         self.selectedGraphFields = []
@@ -603,7 +603,7 @@ class JSGui(QScrollArea):
 
          }
         if self.addMigakuNoteTypeOnApply:
-            self.MigakuModel.addModels() 
+            self.modeler.addModels()
         self.mw.addonManager.writeConfig(__name__, newConf)
         removeLegacy = self.ui.removeLegacy.isChecked()
         self.CSSJSHandler.injectWrapperElements(removeLegacy = removeLegacy)

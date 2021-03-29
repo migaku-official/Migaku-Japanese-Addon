@@ -47,6 +47,7 @@ from .massExporter import MassExporter
 from .autoCSSJSHandling import AutoCSSJSHandler
 from .gui import JSGui
 from .userExceptionManager import UserExceptionManager
+from .models import MILanguageModels
 
 colArray = False
 
@@ -64,6 +65,8 @@ currentField = False
 currentKey = False
 mw.MigakuJSSettings = None
 
+languageModeler = MILanguageModels(mw)
+addHook("profileLoaded", languageModeler.addModels)
 
 def accentGraphCss():
     css = r" .accentsBlock{line-height:35px;} .museika{width:22px;height:22px;border-radius:50% ;border:1px #db4130 dashed} .pitch-box{position:relative} .pitch-box,.pitch-drop,.pitch-overbar{display:inline-block} .pitch-overbar{background-color:#db4130;height:1px;width:100% ;position:absolute;top:-3px;left:0} .pitch-drop{background-color:#db4130;height:6px;width:2px;position:absolute;top:-3px;right:-2px}"
@@ -174,7 +177,7 @@ def loadAllProfileInformation():
 
 def openGui():
     if not mw.MigakuJSSettings:
-        mw.MigakuJSSettings = JSGui(mw, colArray, MigakuModel, openGui, mw.CSSJSHandler, UEManager)
+        mw.MigakuJSSettings = JSGui(mw, colArray, languageModeler, openGui, mw.CSSJSHandler, UEManager)
     mw.MigakuJSSettings.show()
     if mw.MigakuJSSettings.windowState() == Qt.WindowMinimized:
             # Window is minimised. Restore it.
