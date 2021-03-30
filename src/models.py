@@ -130,8 +130,8 @@ src: url(_yumin.ttf);
 
 
 .migaku-sentence{
-    font-size: 25px;
-  line-height: 25px;
+  font-size: 25px;
+  line-height: 30px;
 }
 
 .migaku-translation{
