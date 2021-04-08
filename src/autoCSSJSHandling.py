@@ -295,23 +295,7 @@ class AutoCSSJSHandler:
                             fieldConflictErrors += 'A conflict was found in this field pair:\n\n' + '\n'.join(conflicts) + '\n\n'
                     else:
                             notFoundErrors += '"' + item + '" in "ActiveFields" has the following error(s):\n' + errorMsg + '\n\n'
-        return self.checkWrapperDictErrors(syntaxErrors, displayTypeError, notFoundErrors, fieldConflictErrors, wrapperDict)
-
-    def checkWrapperDictErrors(self, syntaxErrors, displayTypeError, notFoundErrors, fieldConflictErrors,  wrapperDict):
-        if syntaxErrors != '':
-            miInfo('The following entries have incorrect syntax:\nPlease make sure the format is as follows:\n"displayType;profileName;noteTypeName;cardTypeName;fieldName;side(;ReadingType)".\n' + syntaxErrors, level="err")
-            return (wrapperDict, False);
-        if displayTypeError != '':
-            miInfo('The following entries have an incorrect display type. Valid display types are "Hover", "ColoredHover", "Kanji", "ColoredKanji", "KanjiReading", "ColoredKanjiReading", "Reading", and "ColoredReading".\n' + syntaxErrors, level="err")  
-            return (wrapperDict, False);
-        # if notFoundErrors != '': 
-        #     miInfo('The following entries have incorrect values that are not found in your currently loaded Anki profile. Please note that this is not necessarily an error, if these fields or note types may exist within your other Anki profiles.\n\n' + notFoundErrors, level="wrn")
-        #     return (wrapperDict, False);
-        if fieldConflictErrors != '':
-            miInfo('You have entries that point to the same field and the same side. Please make sure that a field and side combination does not conflict.\n\n' + fieldConflictErrors, level="err")
-            return (wrapperDict, False);
-        return (wrapperDict, True);
-
+        return (wrapperDict, True)
 
     def noteCardFieldExists(self, data):
         models = self.mw.col.models.all()

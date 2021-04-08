@@ -125,13 +125,11 @@ src: url(_yumin.ttf);
   margin-top: 20px;
   margin-bottom: 10px;
   font-size: 18px;
-  line-height: 19px;
 }
 
 
 .migaku-sentence{
   font-size: 25px;
-  line-height: 30px;
 }
 
 .migaku-translation{
@@ -153,16 +151,6 @@ src: url(_yumin.ttf);
     grid-template-areas:
     "word-audio word word word word word word word" "sentence-audio sentence sentence sentence sentence sentence sentence sentence" "translation translation translation translation translation translation translation translation" "definition definition definition definition definition definition definition definition";
   }
-
-
-  .migaku-card--back .editableField:nth-of-type(1){
-     font-size:24px;
-  }
-
-  .migaku-card--back .editableField:nth-of-type(3){
-     font-size:25px;
-  }
-
 
   .editableField[data-field="Target Word"]{
     grid-area: word;
