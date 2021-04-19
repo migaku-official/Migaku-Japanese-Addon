@@ -75,6 +75,7 @@ class JSGui(QScrollArea):
     def setInitialValues(self):
         self.setWindowIcon(QIcon(join(addon_path, 'icons', 'migaku.png')))
         self.setWindowTitle("Migaku Japanese Settings (Ver. " + verNumber + ")")
+        self.setWindowFlags(self.windowFlags() | Qt.Dialog | Qt.WindowMinimizeButtonHint)
         self.cont.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         self.cont.setFixedSize(1167, 725)
         self.setWidget(self.cont)
