@@ -891,7 +891,7 @@ class AccentExporter:
             else:
                 self.addToNote(editor, note, field, ordinal, note[field] + sep + text)
         elif overAdd == 'no':
-            if note[field] == ['', '<br>']:
+            if note[field] in ['', '<br>']:
                 self.addToNote(editor, note, field, ordinal, sep.replace('<br>', '', 1) + text)
 
     def addToNote(self, editor, note, field, ordinal, text):
