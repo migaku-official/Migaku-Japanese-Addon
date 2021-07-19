@@ -12,7 +12,7 @@ from anki.hooks import addHook, wrap, runHook, runFilter
 from aqt.utils import shortcut, saveGeom, saveSplitter, showInfo
 import aqt.editor
 import json
-from aqt import mw
+from aqt import mw, gui_hooks
 from aqt.qt import *
 import copy
 from .miutils import miInfo
@@ -352,27 +352,12 @@ def clickPlayAudio(cmd):
         if exists(path):
             sound.play(path)
 
-def revBridgeReroute(self, cmd):
+def audioBridgeHandler(handled, cmd, context):
     if cmd.startswith('playAudio;'):
         if checkProfile() and getConfig()['PlayAudioOnClick'] == 'on':
             clickPlayAudio(cmd)
-            return
-    else:
-        ogRevReroute(self, cmd)
+        return (True, None)
+    return handled
 
-ogRevReroute = aqt.reviewer.Reviewer._linkHandler 
-aqt.reviewer.Reviewer._linkHandler = revBridgeReroute
-
-def prevBridgeReroute(self, cmd):
-    if cmd.startswith('playAudio;'):
-        if checkProfile() and getConfig()['PlayAudioOnClick'] == 'on':
-            clickPlayAudio(cmd)
-            return
-    else:
-        ogAnkiWebBridge(self, cmd)
-
-
-
-ogAnkiWebBridge = AnkiWebView._onBridgeCmd
-AnkiWebView._onBridgeCmd = prevBridgeReroute
+gui_hooks.webview_did_receive_js_message.append(audioBridgeHandler)
 
