@@ -245,8 +245,8 @@ class UserExceptionManager:
         self.proxyFilter.setFilterKeyColumn(0)
 
     def addRule(self, original, overwrite, newCards, learnedCards, parentWidget, addMenu = False):
-        if original == '' or overwrite == '':
-            miInfo('The original and overwrite fields should not be empty.', level='not')
+        if original == '':
+            miInfo('The original field should not be empty.', level='not')
             return False, False;
         if original == overwrite:
             miInfo('The original and overwrite fields should not contain the same text.', level='not')
